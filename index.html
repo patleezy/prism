@@ -983,7 +983,7 @@ async function submitBrief(){
     await genPanel();
     setScreen('panel');updateNav(2);
   }catch(e){
-    err.innerHTML='<strong>Error:</strong> '+e.message;err.style.display='block';
+    err.textContent='Error: '+e.message;err.style.display='block';
   }finally{btn.disabled=false;btn.innerHTML='Build Panel →';}
 }
 
