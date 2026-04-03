@@ -265,13 +265,149 @@
   .empty-sessions-icon{font-size:28px;margin-bottom:10px;}
 
   /* HERO */
-  .hero{text-align:center;padding:64px 0 48px;}
-  .hero .prism-line{margin:0 auto 32px;}
-  .hero-cta{margin-top:36px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap;}
-  .hero-feats{display:flex;justify-content:center;gap:28px;margin-top:44px;flex-wrap:wrap;}
-  .hero-feat{text-align:center;max-width:140px;}
-  .hero-feat-icon{font-size:22px;margin-bottom:7px;}
-  .hero-feat-lbl{font-size:11px;color:var(--text-muted);line-height:1.5;}
+  .hero{
+    text-align:center;
+    padding:80px 0 60px;
+    position:relative;
+    overflow:hidden;
+  }
+  /* Radial spotlight behind content */
+  .hero::before{
+    content:'';
+    position:absolute;
+    top:0;left:50%;
+    transform:translateX(-50%);
+    width:700px;height:500px;
+    background:radial-gradient(ellipse at 50% 30%, rgba(200,181,96,.07) 0%, rgba(106,176,212,.04) 40%, transparent 70%);
+    pointer-events:none;
+    z-index:0;
+  }
+  /* Grain texture overlay */
+  .hero::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    background-size:180px 180px;
+    pointer-events:none;
+    z-index:0;
+    opacity:.5;
+  }
+  .hero > *{position:relative;z-index:1;}
+  /* Big dramatic prism line */
+  .hero-prism{
+    width:160px;height:3px;
+    background:linear-gradient(90deg,#c8b560,#6ab0d4,#a06ac8,#c46060);
+    border-radius:2px;
+    margin:0 auto 40px;
+    position:relative;
+  }
+  .hero-prism::after{
+    content:'';
+    position:absolute;
+    top:0;left:0;right:0;
+    height:3px;
+    background:linear-gradient(90deg,#c8b560,#6ab0d4,#a06ac8,#c46060);
+    border-radius:2px;
+    filter:blur(8px);
+    opacity:.7;
+  }
+  /* Heading scale */
+  .hero-heading{
+    font-family:'Playfair Display',serif;
+    font-size:clamp(36px,7vw,68px);
+    font-weight:700;
+    line-height:1.1;
+    letter-spacing:-1.5px;
+    margin-bottom:20px;
+    color:var(--text);
+  }
+  .hero-heading em{
+    font-style:italic;
+    color:var(--accent);
+    font-size:1.08em;
+    display:block;
+  }
+  /* Subtitle */
+  .hero-subtitle{
+    font-size:16px;
+    color:var(--text-muted);
+    max-width:420px;
+    margin:0 auto 40px;
+    line-height:1.7;
+    letter-spacing:.1px;
+  }
+  /* CTA button — tight pill with glow */
+  .hero-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+    padding:14px 32px;
+    background:var(--accent);
+    color:#0a0a0b;
+    border:none;
+    border-radius:100px;
+    font-family:'DM Sans',sans-serif;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    transition:all .2s;
+    letter-spacing:.2px;
+    position:relative;
+  }
+  .hero-btn::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    border-radius:100px;
+    background:var(--accent);
+    filter:blur(18px);
+    opacity:0;
+    transition:opacity .2s;
+    z-index:-1;
+  }
+  .hero-btn:hover{
+    background:#d4c472;
+    transform:translateY(-2px);
+  }
+  .hero-btn:hover::after{opacity:.35;}
+  /* Feature pills — replace icon grid */
+  .hero-pills{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:48px;
+    padding:0 20px;
+  }
+  .hero-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 14px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:100px;
+    font-size:12px;
+    color:var(--text-muted);
+    letter-spacing:.2px;
+  }
+  .hero-pill-dot{
+    width:5px;height:5px;
+    border-radius:50%;
+    background:var(--accent);
+    opacity:.7;
+    flex-shrink:0;
+  }
+  /* Staggered fade-in for hero elements */
+  @keyframes heroFadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  .hero-prism{animation:heroFadeUp .5s ease both;}
+  .hero-heading{animation:heroFadeUp .5s .1s ease both;}
+  .hero-subtitle{animation:heroFadeUp .5s .2s ease both;}
+  .hero-btn{animation:heroFadeUp .5s .3s ease both;}
+  .hero-pills{animation:heroFadeUp .5s .45s ease both;}
+  [data-theme="light"] .hero::before{background:radial-gradient(ellipse at 50% 30%,rgba(120,95,16,.06) 0%,rgba(42,127,168,.04) 40%,transparent 70%);}
+  [data-theme="light"] .hero-pill{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.08);}
 
   /* PRINT STYLES */
   @media print {
@@ -335,17 +471,23 @@
 <!-- HOME -->
 <div class="screen active" id="screen-home">
   <div class="hero">
-    <div class="prism-line"></div>
-    <h1 class="display-heading">One question.<br><em>Many perspectives.</em><br>Instant clarity.</h1>
-    <p class="subtitle">Simulate a full consumer focus group using AI personas — directional research insights in minutes, not weeks.</p>
-    <div class="hero-cta">
-      <button class="btn btn-primary" onclick="startFlow()">Run a Focus Group →</button>
-    </div>
-    <div class="hero-feats">
-      <div class="hero-feat"><div class="hero-feat-icon">◈</div><div class="hero-feat-lbl">Diverse AI personas per session</div></div>
-      <div class="hero-feat"><div class="hero-feat-icon">⟳</div><div class="hero-feat-lbl">Parallel simulation, ~30 seconds</div></div>
-      <div class="hero-feat"><div class="hero-feat-icon">◎</div><div class="hero-feat-lbl">Exec summary, themes & scores</div></div>
-      <div class="hero-feat"><div class="hero-feat-icon">⊞</div><div class="hero-feat-lbl">Save & reload past sessions</div></div>
+    <div class="hero-prism"></div>
+    <h1 class="hero-heading">
+      One question.
+      <em>Many perspectives.</em>
+      Instant clarity.
+    </h1>
+    <p class="hero-subtitle">Simulate a full consumer focus group using AI personas — directional insights in minutes, not weeks.</p>
+    <button class="hero-btn" onclick="startFlow()">
+      Run a Focus Group
+      <span style="font-size:16px;line-height:1">→</span>
+    </button>
+    <div class="hero-pills">
+      <div class="hero-pill"><span class="hero-pill-dot"></span>Diverse AI personas</div>
+      <div class="hero-pill"><span class="hero-pill-dot"></span>Results in ~30 seconds</div>
+      <div class="hero-pill"><span class="hero-pill-dot"></span>Exec summary &amp; themes</div>
+      <div class="hero-pill"><span class="hero-pill-dot"></span>Save &amp; reload sessions</div>
+      <div class="hero-pill"><span class="hero-pill-dot"></span>PDF, email &amp; TXT export</div>
     </div>
   </div>
 
@@ -585,6 +727,14 @@ const state = {
   brief:{category:'',question:'',researchType:'concept',panelSize:8},
   panel:[],responses:[],synthesis:null
 };
+
+function fmtNum(n){
+  const num=parseFloat(n);
+  if(isNaN(num))return String(n);
+  if(num>=1000)return num.toLocaleString('en-US',{maximumFractionDigits:0});
+  if(Number.isInteger(num))return num.toString();
+  return parseFloat(num.toFixed(2)).toString();
+}
 
 const EMOJIS=['👩','👨','🧑','👴','👵','🧔','👩‍💼','👨‍💼','🧑‍🎓','👩‍🔬','👨‍🎨','🧑‍🍳'];
 
@@ -1126,14 +1276,6 @@ async function callClaude(messages,temperature=0.7,maxTokens=1000,systemPrompt=n
 }
 
 function showError(el,msg){el.textContent=msg;el.style.display='block';}
-
-function fmtNum(n){
-  const num=parseFloat(n);
-  if(isNaN(num))return n;
-  if(num>=1000)return num.toLocaleString('en-US',{maximumFractionDigits:0});
-  if(Number.isInteger(num))return num.toString();
-  return num.toFixed(2).replace(/\.?0+$/,'');
-}
 
 // ── INIT ──
 renderSessions();
