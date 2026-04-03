@@ -19,7 +19,8 @@
   [data-theme="light"]{
     --bg:#f4f3ee;--bg2:#eeede8;--bg3:#e6e5df;
     --border:#d4d3cc;--border-light:#c4c3bb;
-    --text:#1a1a1e;--text-muted:#666670;--text-faint:#aaaaaa;
+    --text:#1a1a1e;--text-muted:#555560;--text-faint:#888888;
+    --accent:#7a5f10;--accent2:#2a7fa8;--accent3:#b03030;--success:#2e7a48;
     --card-bg:#faf9f5;--card-hover:#f0efe9;
   }
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -182,7 +183,7 @@
   @media(max-width:520px){.dashboard-grid{grid-template-columns:1fr;}}
   .metric-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;}
   .metric-label{font-size:10px;color:var(--text-faint);font-family:'DM Mono',monospace;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;}
-  .metric-value{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--accent);line-height:1;margin-bottom:3px;}
+  .metric-value{font-family:'DM Sans',sans-serif;font-size:30px;font-weight:700;color:var(--accent);line-height:1;margin-bottom:3px;letter-spacing:-0.5px;}
   .metric-sub{font-size:12px;color:var(--text-muted);}
   .intent-bar-row{display:flex;align-items:center;gap:11px;margin-bottom:9px;}
   .intent-bar-name{font-size:12px;min-width:72px;color:var(--text-muted);font-family:'Playfair Display',serif;font-style:italic;}
@@ -215,13 +216,28 @@
   tr:last-child td{border-bottom:none;}
   tr:hover td{background:var(--bg2);}
   .td-name{font-family:'Playfair Display',serif;font-style:italic;color:var(--text);font-size:12px;}
-  .score-pill{display:inline-block;padding:2px 7px;border-radius:9px;font-family:'DM Mono',monospace;font-size:10px;background:var(--bg3);color:var(--accent);}
+  .score-pill{display:inline-block;padding:3px 9px;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;background:var(--bg3);color:var(--accent);}
   .copy-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text-muted);cursor:pointer;transition:all .15s;font-family:'DM Mono',monospace;}
   .copy-btn:hover{color:var(--text);border-color:var(--border-light);}
   .copy-btn.copied{color:var(--success);border-color:var(--success);}
   .error-box{background:rgba(196,96,96,.08);border:1px solid rgba(196,96,96,.25);border-radius:var(--radius);padding:12px 15px;font-size:13px;color:var(--accent3);margin-bottom:14px;}
   .spinner{display:inline-block;width:13px;height:13px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;}
   @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* DISCLAIMER BANNER */
+  .disclaimer-banner{display:flex;align-items:flex-start;gap:10px;background:rgba(106,176,212,.07);border:1px solid rgba(106,176,212,.22);border-radius:var(--radius);padding:11px 15px;margin-bottom:22px;}
+  .disclaimer-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
+  .disclaimer-text{font-size:12px;color:var(--text-muted);line-height:1.6;flex:1;}
+  .disclaimer-text strong{color:var(--accent2);font-weight:600;}
+  .disclaimer-dismiss{background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:16px;padding:0 0 0 8px;line-height:1;flex-shrink:0;transition:color .15s;}
+  .disclaimer-dismiss:hover{color:var(--text-muted);}
+
+  /* WTP TOOLTIP */
+  .wtp-info{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);color:var(--text-faint);font-size:8px;cursor:pointer;font-style:normal;font-weight:700;flex-shrink:0;position:relative;font-family:'DM Mono',monospace;vertical-align:middle;margin-left:4px;}
+  .wtp-info:hover{border-color:var(--accent2);color:var(--accent2);}
+  .wtp-tip{position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%) translateY(3px);background:#1e2028;border:1px solid var(--border-light);border-radius:var(--radius);padding:10px 13px;width:220px;font-size:11px;color:var(--text-muted);line-height:1.6;z-index:500;pointer-events:none;opacity:0;transition:opacity .15s,transform .15s;box-shadow:0 8px 28px rgba(0,0,0,.5);}
+  [data-theme="light"] .wtp-tip{background:#fff;}
+  .wtp-info:hover .wtp-tip,.wtp-tip.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
   /* EXPORT BUTTONS */
   .export-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:0;}
@@ -516,6 +532,7 @@
   <div style="margin-bottom:32px;padding-bottom:28px;border-bottom:1px solid var(--border)">
     <div class="section-label">Research Findings</div>
     <h2 class="display-heading" id="res-heading">Focus Group <em>Insights</em></h2>
+    <div style="margin-top:6px;margin-bottom:2px"><span id="res-type-tag" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-faint);background:var(--bg3);padding:3px 9px;border-radius:8px;border:1px solid var(--border)"></span></div>
     <div class="export-row" style="margin-top:14px;flex-wrap:wrap;gap:8px;">
       <button class="export-btn save-btn" id="save-btn" onclick="saveSession()">⊕ Save Session</button>
       <button class="export-btn" id="copy-btn" onclick="copySummary()">⎘ Copy</button>
@@ -524,6 +541,13 @@
       <button class="export-btn" onclick="exportPDF()">⎙ PDF</button>
       <button class="btn btn-ghost btn-sm" onclick="startOver()">↺ New</button>
     </div>
+  </div>
+
+  <!-- DISCLAIMER BANNER -->
+  <div class="disclaimer-banner" id="disclaimer-banner">
+    <span class="disclaimer-icon">⚠</span>
+    <span class="disclaimer-text"><strong>AI Simulation — Directional Only.</strong> These results are generated by AI personas, not real consumers. Findings are meant to inform decisions, not replace actual research. Real focus groups, surveys, and consumer interviews will differ. Do not use as the sole basis for major business decisions.</span>
+    <button class="disclaimer-dismiss" onclick="document.getElementById('disclaimer-banner').style.display='none'" title="Dismiss">×</button>
   </div>
 
   <div class="exec-summary"><div class="exec-lbl">Executive Summary</div><div class="exec-text" id="exec-text"></div></div>
@@ -547,7 +571,7 @@
   <div class="raw-wrap" id="raw-wrap">
     <table><thead><tr>
       <th>Persona</th><th>Warm-up</th><th>Core Response</th><th>Follow-up</th>
-      <th>Intent</th><th>WTP Low</th><th>WTP High</th><th>Top Objection</th>
+      <th>Intent</th><th>WTP Low <i class="wtp-info">i<span class="wtp-tip">Willingness to Pay — lowest price the persona considers reasonable.</span></i></th><th>WTP High <i class="wtp-info">i<span class="wtp-tip">Highest price before the persona walks away entirely.</span></i></th><th>Top Objection</th>
     </tr></thead><tbody id="raw-tbody"></tbody></table>
   </div>
 </div>
@@ -617,7 +641,7 @@ function startFlow(){
   const sessions=getSessions();
   if(sessions.length>0) document.getElementById('how-to-banner').classList.remove('open');
 }
-function startOver(){state.panel=[];state.responses=[];state.synthesis=null;startFlow();}
+function startOver(){if(state.synthesis&&!confirm('Start a new focus group? Your current results will be lost if unsaved.'))return;state.panel=[];state.responses=[];state.synthesis=null;startFlow();}
 function goToStep(name,n){setScreen(name);updateNav(n);}
 function setScreen(n){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -710,7 +734,7 @@ Each object has these exact keys:
 - likely_stance: 1 sentence
 - archetype: exactly one of these values: Value Maximizer, Status Seeker, Reluctant Upgrader, Practical Optimizer, Lifestyle Aligner, Social Validator, Power User, Budget Stretcher, Skeptic, Loyalist
 
-Requirements: diverse ages 22-65, mixed income bands, mixed location types, include at least one Skeptic, each persona gets a unique archetype, personas should genuinely disagree with each other.`;
+Requirements: diverse ages 22-65, mixed income bands, mixed location types, include at least one Skeptic, each persona gets a unique archetype, personas should genuinely disagree with each other. IMPORTANT: every persona must have a unique first name — no duplicate names.`;
 
   const data=await callClaude([{role:'user',content:prompt}],0.85,2800,sys);
   state.panel=safeParseJSON(data.content[0].text);
@@ -851,15 +875,18 @@ Generate 4-6 themes with specific memorable names.`;
 // ── RENDER RESULTS ──
 function renderResults(){
   const s=state.synthesis,r=state.responses;
+  window.scrollTo(0,0);
+  const typeLabels={concept:'Concept Test',price:'Price Sensitivity',message:'Message Test',open:'Open Research'};
   document.getElementById('res-heading').innerHTML=`<em>${state.brief.category}</em> — Insights`;
+  document.getElementById('res-type-tag').textContent=typeLabels[state.brief.researchType]||state.brief.researchType;
   document.getElementById('exec-text').innerHTML=s.executive_summary.split('\n').filter(p=>p.trim()).map(p=>`<p>${p}</p>`).join('');
   document.getElementById('actions-list').innerHTML=(s.recommended_actions||[]).map((a,i)=>`<div class="action-item"><div class="action-num">0${i+1}</div><div class="action-text">${a}</div></div>`).join('');
 
   const pos=r.filter(x=>(x.purchase_intent||0)>=6).length;
   document.getElementById('dash-grid').innerHTML=`
     <div class="metric-card"><div class="metric-label">Avg Intent</div><div class="metric-value">${s.avg_purchase_intent}<span style="font-size:16px;color:var(--text-muted)">/10</span></div><div class="metric-sub">${r.length} personas</div></div>
-    <div class="metric-card"><div class="metric-label">WTP Range</div><div class="metric-value" style="font-size:20px">$${s.wtp_range.low}–$${s.wtp_range.high}</div><div class="metric-sub">Acceptable window</div></div>
-    <div class="metric-card"><div class="metric-label">Positive Lean</div><div class="metric-value">${Math.round((pos/r.length)*100)}<span style="font-size:16px;color:var(--text-muted)">%</span></div><div class="metric-sub">Intent ≥ 6/10</div></div>`;
+    <div class="metric-card"><div class="metric-label" style="display:flex;align-items:center;gap:4px">WTP Range <i class="wtp-info" style="margin-left:2px">i<span class="wtp-tip">Willingness to Pay range — the acceptable price window across your panel. Low = floor, High = ceiling before walk-away.</span></i></div><div class="metric-value" style="font-size:22px">$${fmtNum(s.wtp_range.low)}–$${fmtNum(s.wtp_range.high)}</div><div class="metric-sub">Acceptable price window</div></div>
+    <div class="metric-card"><div class="metric-label">Positive Lean</div><div class="metric-value">${Math.round((pos/r.length)*100)}<span style="font-size:16px;color:var(--text-muted)">%</span></div><div class="metric-sub">${pos===r.length?'All personas':'Intent ≥ 6/10'}</div></div>`;
 
   const sorted=[...r].sort((a,b)=>(b.purchase_intent||0)-(a.purchase_intent||0));
   document.getElementById('intent-chart').innerHTML=sorted.map(x=>{
@@ -871,9 +898,9 @@ function renderResults(){
 
   document.getElementById('themes-grid').innerHTML=(s.themes||[]).map(t=>`<div class="theme-card"><div class="theme-name">${t.name}</div><div class="theme-desc">${t.description}</div><div class="theme-quote">${t.representative_quote}</div><div class="theme-count">${t.persona_count} persona${t.persona_count!==1?'s':''} · ${(t.persona_names||[]).join(', ')}</div></div>`).join('');
   document.getElementById('obj-list').innerHTML=(s.key_objections||[]).map(o=>`<span class="objection-tag">⚑ ${o}</span>`).join('');
-  document.getElementById('seg-box').textContent=s.segment_insights||'';
-  document.getElementById('limits-box').innerHTML=`<strong>Research Limitations</strong><br>${s.limitations||''}`;
-  document.getElementById('raw-tbody').innerHTML=r.map(x=>`<tr><td class="td-name">${x.personaName}<br><span style="font-size:9px;color:var(--text-faint);font-family:'DM Mono',monospace">${x.archetype}</span></td><td>${x.warmup}</td><td>${x.core}</td><td>${x.followup}</td><td><span class="score-pill">${x.purchase_intent}/10</span></td><td style="font-family:'DM Mono',monospace;font-size:11px">$${x.wtp_low}</td><td style="font-family:'DM Mono',monospace;font-size:11px">$${x.wtp_high}</td><td>${x.top_objection}</td></tr>`).join('');
+  document.getElementById('seg-box').innerHTML=(s.segment_insights||'').split('\n').filter(p=>p.trim()).map(p=>`<p style="margin-bottom:10px">${p}</p>`).join('');
+  document.getElementById('limits-box').innerHTML=`<strong>Research Limitations</strong><br>${s.limitations||'These findings are based on AI-simulated personas and should be treated as directional. Actual consumer behavior may differ significantly.'}`;
+  document.getElementById('raw-tbody').innerHTML=r.map(x=>`<tr><td class="td-name">${x.personaName}<br><span style="font-size:9px;color:var(--text-faint);font-family:'DM Mono',monospace">${x.archetype}</span></td><td>${x.warmup}</td><td>${x.core}</td><td>${x.followup}</td><td><span class="score-pill">${x.purchase_intent}/10</span></td><td style="font-family:'DM Mono',monospace;font-size:11px">$${fmtNum(x.wtp_low)}</td><td style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500">$${fmtNum(x.wtp_high)}</td><td>${x.top_objection}</td></tr>`).join('');
 
   // Reset save button
   const sb=document.getElementById('save-btn');
@@ -998,6 +1025,9 @@ function saveSessions(sessions){
 }
 
 function saveSession(){
+  const btn=document.getElementById('save-btn');
+  if(btn.disabled)return;
+  btn.disabled=true;
   const s=state.synthesis;
   const session={
     id:'s_'+Date.now(),
@@ -1096,6 +1126,14 @@ async function callClaude(messages,temperature=0.7,maxTokens=1000,systemPrompt=n
 }
 
 function showError(el,msg){el.textContent=msg;el.style.display='block';}
+
+function fmtNum(n){
+  const num=parseFloat(n);
+  if(isNaN(num))return n;
+  if(num>=1000)return num.toLocaleString('en-US',{maximumFractionDigits:0});
+  if(Number.isInteger(num))return num.toString();
+  return num.toFixed(2).replace(/\.?0+$/,'');
+}
 
 // ── INIT ──
 renderSessions();
