@@ -60,7 +60,7 @@
   /* FORM */
   .form-group{margin-bottom:24px;}
   label.field-lbl{display:block;font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:7px;letter-spacing:.2px;}
-  input[type="text"],textarea{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;padding:12px 15px;transition:border-color .2s,box-shadow .2s;outline:none;-webkit-appearance:none;}
+  input[type="text"],textarea{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;padding:12px 15px;transition:border-color .2s,box-shadow .2s;outline:none;-webkit-appearance:none;}
   input[type="text"]:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(200,181,96,.12);}
   textarea{min-height:96px;resize:vertical;line-height:1.6;}
 
@@ -85,6 +85,11 @@
   .tooltip-ex{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);color:var(--text-faint);font-style:italic;font-size:11px;}
   .tooltip-close{float:right;background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:16px;line-height:1;padding:0 0 0 8px;margin-top:-2px;}
   .tooltip-close:hover{color:var(--text);}
+
+  /* QUESTION QUALITY METER */
+  .q-hint-weak{color:var(--text-faint);}
+  .q-hint-good{color:var(--success);}
+  .q-hint-long{color:var(--accent2);}
 
   /* CHIPS */
   .chips-wrap{margin-bottom:9px;}
@@ -605,7 +610,7 @@
 
   <div class="form-group">
     <label class="field-lbl">Product or Service Category</label>
-    <input type="text" id="i-cat" placeholder="e.g. Premium wireless headphones, Local ice cream shop, Luxury car subscription…" maxlength="120">
+    <input type="text" id="i-cat" placeholder="e.g. Beats headphones, a local LA ice cream shop, Nintendo Switch games…" maxlength="120">
   </div>
 
   <!-- Tooltip containers — rendered outside cards so they're not clipped -->
@@ -681,7 +686,8 @@
       <div class="chips-label">✦ Inspiration</div>
       <div class="chips-row" id="chips-row"></div>
     </div>
-    <textarea id="i-q" placeholder="Ask a specific question… or tap a chip above to get started."></textarea>
+    <textarea id="i-q" placeholder="Ask a specific question… or tap a chip above to get started." oninput="checkQuestionQuality(this.value)"></textarea>
+    <div id="q-quality" style="height:20px;margin-top:6px;font-size:11px;transition:all .2s;"></div>
   </div>
 
   <div class="form-group">
@@ -708,7 +714,7 @@
   <div class="panel-grid" id="panel-grid"></div>
   <div id="panel-err" class="error-box" style="display:none"></div>
   <div class="btn-row">
-    <button class="btn btn-primary" onclick="runSimulation()">Run Focus Group →</button>
+    <button class="btn btn-primary" onclick="runSimulation()">Run Focus Group <span style="opacity:.6;font-weight:400;font-size:12px">· ~30 sec</span> →</button>
     <button class="btn btn-secondary" id="regen-btn" onclick="regenPanel()">↺ Regenerate</button>
     <button class="btn btn-ghost" onclick="goToStep('brief',1)">← Brief</button>
   </div>
@@ -903,6 +909,20 @@ function toggleTheme(){
 }
 
 // ── CHIPS ──
+function checkQuestionQuality(val){
+  const el=document.getElementById('q-quality');
+  if(!el)return;
+  const len=val.trim().length;
+  if(len===0){el.innerHTML='';return;}
+  if(len<40){
+    el.innerHTML='<span class="q-hint-weak">↑ Be more specific — add a price point, brand name, or concrete detail</span>';
+  } else if(len<=220){
+    el.innerHTML='<span class="q-hint-good">✓ Good — specific enough for strong persona responses</span>';
+  } else {
+    el.innerHTML='<span class="q-hint-long">↓ Consider trimming — focused questions get sharper responses</span>';
+  }
+}
+
 function renderChips(type){
   const row=document.getElementById('chips-row');
   if(!row)return;
@@ -911,7 +931,13 @@ function renderChips(type){
     const el=document.createElement('div');
     el.className='chip';
     el.innerHTML=`<span>${c.i}</span>${c.t}`;
-    el.onclick=()=>{document.getElementById('i-q').value=c.t;document.getElementById('i-q').focus();};
+    el.onclick=()=>{
+    const q=document.getElementById('i-q');
+    const existing=q.value.trim();
+    q.value=existing?existing+' '+c.t:c.t;
+    q.focus();
+    checkQuestionQuality(q.value);
+  };
     row.appendChild(el);
   });
 }
