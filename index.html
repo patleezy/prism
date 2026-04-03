@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prism — Synthetic Focus Groups</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0a0a0b;--bg2:#111113;--bg3:#1a1a1e;
+    --border:#2a2a30;--border-light:#3a3a44;
+    --text:#e8e8ec;--text-muted:#888894;--text-faint:#4a4a56;
+    --accent:#c8b560;--accent2:#6ab0d4;--accent3:#c46060;--success:#5a9e6e;
+    --prism:linear-gradient(90deg,#c8b560,#6ab0d4,#a06ac8,#c46060);
+    --card-bg:#131316;--card-hover:#1c1c22;
+    --radius:8px;--radius-lg:14px;
+  }
+  [data-theme="light"]{
+    --bg:#f4f3ee;--bg2:#eeede8;--bg3:#e6e5df;
+    --border:#d4d3cc;--border-light:#c4c3bb;
+    --text:#1a1a1e;--text-muted:#666670;--text-faint:#aaaaaa;
+    --card-bg:#faf9f5;--card-hover:#f0efe9;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+
+  /* HEADER */
+  header{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:200;}
+  .logo{display:flex;align-items:center;gap:9px;cursor:pointer;text-decoration:none;}
+  .logo-name{font-family:'Playfair Display',serif;font-size:19px;font-weight:600;color:var(--text);}
+  .header-right{display:flex;align-items:center;gap:10px;}
+  .theme-btn{background:none;border:1px solid var(--border);color:var(--text-muted);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:12px;transition:all .2s;}
+  .theme-btn:hover{border-color:var(--border-light);color:var(--text);}
+
+  /* STEPS */
+  .steps-bar{display:flex;align-items:center;padding:0 28px;border-bottom:1px solid var(--border);overflow-x:auto;}
+  .step-item{display:flex;align-items:center;gap:7px;padding:13px 14px;font-size:11px;font-weight:500;color:var(--text-faint);white-space:nowrap;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:.5px;text-transform:uppercase;}
+  .step-item.active{color:var(--accent);border-bottom-color:var(--accent);}
+  .step-item.done{color:var(--text-muted);}
+  .step-num{width:19px;height:19px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:10px;font-family:'DM Mono',monospace;}
+  .step-item.active .step-num{background:var(--accent);color:var(--bg);}
+  .step-item.done .step-num{background:var(--success);color:#fff;}
+  .step-divider{color:var(--text-faint);font-size:10px;padding:0 3px;}
+
+  /* MAIN */
+  main{max-width:840px;margin:0 auto;padding:44px 22px 80px;}
+  .screen{display:none;animation:fadeIn .3s ease;}
+  .screen.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+  /* TYPE */
+  .display-heading{font-family:'Playfair Display',serif;font-size:clamp(26px,5vw,40px);font-weight:700;line-height:1.15;letter-spacing:-.5px;margin-bottom:11px;}
+  .display-heading em{font-style:italic;color:var(--accent);}
+  .subtitle{font-size:15px;color:var(--text-muted);max-width:540px;margin-bottom:36px;line-height:1.7;}
+  .section-label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-faint);margin-bottom:8px;}
+  .prism-line{height:2px;background:var(--prism);border-radius:1px;margin-bottom:36px;width:72px;}
+
+  /* FORM */
+  .form-group{margin-bottom:24px;}
+  label.field-lbl{display:block;font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:7px;letter-spacing:.2px;}
+  input[type="text"],textarea{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;padding:12px 15px;transition:border-color .2s,box-shadow .2s;outline:none;-webkit-appearance:none;}
+  input[type="text"]:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(200,181,96,.12);}
+  textarea{min-height:96px;resize:vertical;line-height:1.6;}
+
+  /* TYPE CARDS */
+  .type-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;}
+  @media(max-width:480px){.type-grid{grid-template-columns:1fr;}}
+  .type-card{border:1px solid var(--border);border-radius:var(--radius);padding:13px 15px;cursor:pointer;transition:all .15s;background:var(--bg2);position:relative;}
+  .type-card:hover{border-color:var(--border-light);background:var(--bg3);}
+  .type-card.selected{border-color:var(--accent);background:rgba(200,181,96,.06);}
+  .type-card input{display:none;}
+  .type-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;}
+  .type-card-name{font-weight:500;font-size:14px;}
+  .type-card-desc{font-size:12px;color:var(--text-muted);}
+
+  /* INFO ICON + TOOLTIP */
+  .info-icon{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);color:var(--text-faint);font-size:9px;cursor:pointer;font-style:normal;font-weight:600;flex-shrink:0;transition:all .15s;position:relative;font-family:'DM Mono',monospace;z-index:10;}
+  .info-icon:hover{border-color:var(--accent2);color:var(--accent2);}
+  .tooltip-box{position:absolute;bottom:calc(100% + 8px);right:0;background:#1e2028;border:1px solid var(--border-light);border-radius:var(--radius);padding:13px 15px;width:240px;font-size:11px;color:var(--text-muted);line-height:1.65;z-index:400;pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s;box-shadow:0 8px 28px rgba(0,0,0,.5);}
+  [data-theme="light"] .tooltip-box{background:#fff;}
+  .tooltip-box.show{opacity:1;transform:translateY(0);}
+  .tooltip-title{font-weight:600;color:var(--text);margin-bottom:5px;font-size:11px;}
+  .tooltip-ex{margin-top:7px;padding-top:7px;border-top:1px solid var(--border);color:var(--text-faint);font-style:italic;}
+
+  /* CHIPS */
+  .chips-wrap{margin-bottom:9px;}
+  .chips-label{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:1px;text-transform:uppercase;color:var(--text-faint);margin-bottom:8px;}
+  .chips-row{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;font-size:11px;color:var(--text-muted);cursor:pointer;transition:all .15s;line-height:1.3;}
+  .chip:hover{border-color:var(--accent);color:var(--accent);background:rgba(200,181,96,.06);}
+
+  /* PANEL SIZE */
+  .panel-size-row{display:flex;align-items:center;gap:10px;}
+  .panel-size-row input[type="range"]{flex:1;accent-color:var(--accent);background:none;border:none;padding:0;box-shadow:none;}
+  .psv{font-family:'DM Mono',monospace;font-size:17px;font-weight:500;color:var(--accent);min-width:24px;text-align:right;}
+
+  /* HOW TO BANNER */
+  .how-to{border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:26px;}
+  .how-to-toggle{display:flex;align-items:center;justify-content:space-between;padding:12px 17px;cursor:pointer;background:var(--bg2);user-select:none;}
+  .how-to-toggle:hover{background:var(--bg3);}
+  .how-to-left{display:flex;align-items:center;gap:8px;}
+  .how-to-lbl{font-size:12px;font-weight:500;color:var(--text-muted);}
+  .how-to-badge{font-size:10px;padding:2px 7px;border-radius:10px;background:rgba(200,181,96,.15);color:var(--accent);border:1px solid rgba(200,181,96,.25);font-family:'DM Mono',monospace;}
+  .how-to-chev{color:var(--text-faint);font-size:11px;transition:transform .25s;}
+  .how-to.open .how-to-chev{transform:rotate(180deg);}
+  .how-to-body{display:none;padding:18px 17px;border-top:1px solid var(--border);background:var(--card-bg);}
+  .how-to.open .how-to-body{display:block;}
+  .how-to-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+  @media(max-width:560px){.how-to-steps{grid-template-columns:repeat(2,1fr);}}
+  .how-to-step{text-align:center;padding:13px 9px;background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);}
+  .how-to-step-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);margin-bottom:5px;letter-spacing:1px;}
+  .how-to-step-icon{font-size:19px;margin-bottom:5px;}
+  .how-to-step-title{font-size:12px;font-weight:600;margin-bottom:3px;}
+  .how-to-step-desc{font-size:10px;color:var(--text-muted);line-height:1.5;}
+  .how-to-tips{background:var(--bg2);border-radius:var(--radius);padding:12px 14px;border:1px solid var(--border);}
+  .how-to-tips-lbl{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:1px;text-transform:uppercase;color:var(--text-faint);margin-bottom:8px;}
+  .how-to-tip{font-size:12px;color:var(--text-muted);padding:3px 0;display:flex;gap:7px;line-height:1.5;}
+  .how-to-tip::before{content:'→';color:var(--accent);flex-shrink:0;}
+
+  /* BUTTONS */
+  .btn{display:inline-flex;align-items:center;gap:7px;padding:11px 22px;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;}
+  .btn-primary{background:var(--accent);color:#0a0a0b;}
+  .btn-primary:hover{background:#d4c070;transform:translateY(-1px);}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+  .btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border);}
+  .btn-secondary:hover{border-color:var(--border-light);}
+  .btn-ghost{background:none;color:var(--text-muted);border:1px solid var(--border);}
+  .btn-ghost:hover{color:var(--text);border-color:var(--border-light);}
+  .btn-sm{padding:7px 14px;font-size:12px;}
+  .btn-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:32px;}
+  .btn-danger{background:none;color:var(--accent3);border:1px solid rgba(196,96,96,.3);font-size:12px;padding:5px 10px;}
+  .btn-danger:hover{background:rgba(196,96,96,.08);border-color:var(--accent3);}
+
+  /* PANEL */
+  .panel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-bottom:28px;}
+  .persona-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;position:relative;transition:all .2s;animation:cardIn .3s ease both;}
+  @keyframes cardIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+  .persona-avatar{width:36px;height:36px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:10px;border:2px solid var(--border);}
+  .persona-name{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;margin-bottom:2px;}
+  .persona-meta{font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-bottom:7px;}
+  .persona-archetype{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;background:var(--bg3);color:var(--text-muted);border:1px solid var(--border);margin-bottom:6px;}
+  .persona-stance{font-size:11px;color:var(--text-muted);line-height:1.5;font-style:italic;}
+  .persona-regen{position:absolute;top:11px;right:11px;background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:14px;padding:3px;border-radius:4px;transition:color .15s;line-height:1;}
+  .persona-regen:hover{color:var(--text-muted);}
+
+  /* RUNNING */
+  .running-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:11px;margin-bottom:28px;}
+  .sim-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;transition:all .3s;min-height:100px;display:flex;flex-direction:column;justify-content:space-between;}
+  .sim-card.pending{opacity:.5;}
+  .sim-card.running{border-color:var(--accent);animation:pulse 1.5s ease-in-out infinite;}
+  .sim-card.done{border-color:var(--success);}
+  .sim-card.error{border-color:var(--accent3);}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(200,181,96,0)}50%{box-shadow:0 0 0 5px rgba(200,181,96,.12)}}
+  .sim-name{font-family:'Playfair Display',serif;font-size:14px;font-weight:600;margin-bottom:2px;}
+  .sim-meta{font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;}
+  .sim-status{font-size:10px;font-family:'DM Mono',monospace;display:flex;align-items:center;gap:5px;margin-top:8px;}
+  .sim-status.pending{color:var(--text-faint);}
+  .sim-status.running{color:var(--accent);}
+  .sim-status.done{color:var(--success);}
+  .sim-status.error{color:var(--accent3);}
+  .dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
+  .dot.running{animation:blink 1s ease-in-out infinite;}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+  .status-bar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:14px;}
+  .running-label{font-size:12px;color:var(--text-muted);}
+  .running-count{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--accent);}
+  .progress-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;flex:1;}
+  .progress-fill{height:100%;background:var(--prism);border-radius:2px;transition:width .4s ease;width:0%;}
+
+  /* RESULTS */
+  .exec-summary{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:28px;position:relative;overflow:hidden;}
+  .exec-summary::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--prism);}
+  .exec-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-faint);margin-bottom:14px;}
+  .exec-text{font-size:14px;line-height:1.8;color:var(--text);}
+  .exec-text p{margin-bottom:12px;}
+  .exec-text p:last-child{margin-bottom:0;}
+  .sec-div{display:flex;align-items:center;gap:14px;margin:28px 0 18px;}
+  .sec-div-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-faint);white-space:nowrap;}
+  .sec-div-line{flex:1;height:1px;background:var(--border);}
+  .dashboard-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px;}
+  @media(max-width:520px){.dashboard-grid{grid-template-columns:1fr;}}
+  .metric-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;}
+  .metric-label{font-size:10px;color:var(--text-faint);font-family:'DM Mono',monospace;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;}
+  .metric-value{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--accent);line-height:1;margin-bottom:3px;}
+  .metric-sub{font-size:12px;color:var(--text-muted);}
+  .intent-bar-row{display:flex;align-items:center;gap:11px;margin-bottom:9px;}
+  .intent-bar-name{font-size:12px;min-width:72px;color:var(--text-muted);font-family:'Playfair Display',serif;font-style:italic;}
+  .intent-bar-track{flex:1;height:7px;background:var(--bg3);border-radius:4px;overflow:hidden;}
+  .intent-bar-fill{height:100%;border-radius:4px;background:var(--accent);transition:width .8s cubic-bezier(.34,1.56,.64,1);width:0;}
+  .intent-bar-val{font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);min-width:22px;text-align:right;}
+  .themes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-bottom:28px;}
+  .theme-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:19px;}
+  .theme-name{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;margin-bottom:5px;}
+  .theme-desc{font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;}
+  .theme-quote{font-size:11px;color:var(--text-muted);font-style:italic;border-left:2px solid var(--accent);padding-left:9px;line-height:1.5;margin-bottom:8px;}
+  .theme-count{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-faint);}
+  .objection-tag{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:rgba(196,96,96,.1);border:1px solid rgba(196,96,96,.25);border-radius:20px;font-size:11px;color:var(--accent3);margin:3px;}
+  .action-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+  .action-item:last-child{border-bottom:none;}
+  .action-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);min-width:18px;padding-top:2px;}
+  .action-text{font-size:14px;line-height:1.6;}
+  .segment-box{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;margin-bottom:28px;font-size:14px;line-height:1.8;color:var(--text-muted);}
+  .limits-box{background:rgba(106,176,212,.06);border:1px solid rgba(106,176,212,.2);border-radius:var(--radius);padding:14px 18px;margin-bottom:28px;font-size:12px;color:var(--text-muted);line-height:1.6;}
+  .limits-box strong{color:var(--accent2);font-size:10px;letter-spacing:.5px;text-transform:uppercase;}
+  .raw-toggle{display:flex;align-items:center;justify-content:space-between;padding:12px 17px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;margin-bottom:2px;transition:background .15s;}
+  .raw-toggle:hover{background:var(--bg3);}
+  .raw-toggle.open .raw-icon{transform:rotate(180deg);}
+  .raw-icon{transition:transform .2s;font-size:12px;color:var(--text-faint);}
+  .raw-wrap{display:none;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);overflow-x:auto;margin-bottom:28px;}
+  .raw-wrap.open{display:block;}
+  table{width:100%;border-collapse:collapse;font-size:11px;}
+  th{text-align:left;padding:9px 12px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text-faint);background:var(--bg2);border-bottom:1px solid var(--border);white-space:nowrap;}
+  td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--text-muted);line-height:1.4;}
+  tr:last-child td{border-bottom:none;}
+  tr:hover td{background:var(--bg2);}
+  .td-name{font-family:'Playfair Display',serif;font-style:italic;color:var(--text);font-size:12px;}
+  .score-pill{display:inline-block;padding:2px 7px;border-radius:9px;font-family:'DM Mono',monospace;font-size:10px;background:var(--bg3);color:var(--accent);}
+  .copy-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text-muted);cursor:pointer;transition:all .15s;font-family:'DM Mono',monospace;}
+  .copy-btn:hover{color:var(--text);border-color:var(--border-light);}
+  .copy-btn.copied{color:var(--success);border-color:var(--success);}
+  .error-box{background:rgba(196,96,96,.08);border:1px solid rgba(196,96,96,.25);border-radius:var(--radius);padding:12px 15px;font-size:13px;color:var(--accent3);margin-bottom:14px;}
+  .spinner{display:inline-block;width:13px;height:13px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* EXPORT BUTTONS */
+  .export-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:0;}
+  .export-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text-muted);cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;font-weight:500;}
+  .export-btn:hover{color:var(--text);border-color:var(--border-light);}
+  .export-btn.save-btn{border-color:var(--accent);color:var(--accent);background:rgba(200,181,96,.06);}
+  .export-btn.save-btn:hover{background:rgba(200,181,96,.12);}
+  .export-btn.saved-btn{border-color:var(--success);color:var(--success);background:rgba(90,158,110,.06);}
+
+  /* SAVED SESSIONS */
+  .sessions-section{margin-top:44px;}
+  .sessions-section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .sessions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+  .session-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;cursor:pointer;transition:all .2s;position:relative;}
+  .session-card:hover{border-color:var(--border-light);background:var(--card-hover);}
+  .session-card-category{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;margin-bottom:5px;padding-right:28px;}
+  .session-card-q{font-size:12px;color:var(--text-muted);line-height:1.5;margin-bottom:10px;padding-right:28px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .session-card-meta{display:flex;align-items:center;gap:10px;}
+  .session-card-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-faint);}
+  .session-card-intent{font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);background:rgba(200,181,96,.1);padding:2px 8px;border-radius:10px;border:1px solid rgba(200,181,96,.2);}
+  .session-card-type{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-faint);background:var(--bg3);padding:2px 7px;border-radius:8px;}
+  .session-delete{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:14px;padding:3px 5px;border-radius:4px;transition:color .15s;line-height:1;}
+  .session-delete:hover{color:var(--accent3);}
+  .empty-sessions{text-align:center;padding:32px 20px;border:1px dashed var(--border);border-radius:var(--radius-lg);color:var(--text-faint);font-size:13px;}
+  .empty-sessions-icon{font-size:28px;margin-bottom:10px;}
+
+  /* HERO */
+  .hero{text-align:center;padding:64px 0 48px;}
+  .hero .prism-line{margin:0 auto 32px;}
+  .hero-cta{margin-top:36px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap;}
+  .hero-feats{display:flex;justify-content:center;gap:28px;margin-top:44px;flex-wrap:wrap;}
+  .hero-feat{text-align:center;max-width:140px;}
+  .hero-feat-icon{font-size:22px;margin-bottom:7px;}
+  .hero-feat-lbl{font-size:11px;color:var(--text-muted);line-height:1.5;}
+
+  /* PRINT STYLES */
+  @media print {
+    header,.steps-bar,.btn-row,.export-row,.raw-toggle,.raw-wrap,.how-to,
+    .copy-btn,.theme-btn,.persona-regen{display:none!important;}
+    body{background:#fff!important;color:#000!important;font-size:12px;}
+    .screen{display:block!important;}
+    #screen-home,#screen-brief,#screen-panel,#screen-running{display:none!important;}
+    #screen-results{display:block!important;}
+    main{padding:0!important;max-width:100%!important;}
+    .exec-summary,.metric-card,.theme-card,.segment-box{background:#f9f9f9!important;border-color:#ddd!important;break-inside:avoid;}
+    .display-heading{font-size:22px!important;}
+    .exec-text{font-size:11px!important;}
+    .metric-value{font-size:22px!important;}
+    .prism-line{background:linear-gradient(90deg,#c8b560,#6ab0d4,#a06ac8,#c46060)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .exec-summary::before{background:linear-gradient(90deg,#c8b560,#6ab0d4,#a06ac8,#c46060)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .intent-bar-fill{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    @page{margin:1.5cm;size:A4;}
+  }
+
+  ::-webkit-scrollbar{width:5px;height:5px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+  @media(max-width:600px){
+    header{padding:14px 18px;}
+    .steps-bar{padding:0 18px;}
+    main{padding:28px 14px 60px;}
+    .dashboard-grid{grid-template-columns:repeat(2,1fr);}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="#" onclick="goHome();return false;">
+    <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+      <polygon points="14,3 25,22 3,22" stroke="#c8b560" stroke-width="1.5" fill="none"/>
+      <line x1="14" y1="3" x2="14" y2="22" stroke="#6ab0d4" stroke-width="1" opacity="0.6"/>
+      <line x1="14" y1="3" x2="8" y2="22" stroke="#a06ac8" stroke-width="1" opacity="0.5"/>
+      <line x1="14" y1="3" x2="20" y2="22" stroke="#c46060" stroke-width="1" opacity="0.5"/>
+    </svg>
+    <span class="logo-name">Prism</span>
+  </a>
+  <div class="header-right">
+    <button class="theme-btn" onclick="toggleTheme()">◐ Theme</button>
+  </div>
+</header>
+
+<div class="steps-bar" id="stepsBar" style="display:none">
+  <div class="step-item" id="sn1"><span class="step-num">1</span> Brief</div>
+  <span class="step-divider">›</span>
+  <div class="step-item" id="sn2"><span class="step-num">2</span> Panel</div>
+  <span class="step-divider">›</span>
+  <div class="step-item" id="sn3"><span class="step-num">3</span> Simulate</div>
+  <span class="step-divider">›</span>
+  <div class="step-item" id="sn4"><span class="step-num">4</span> Insights</div>
+</div>
+
+<main>
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div class="hero">
+    <div class="prism-line"></div>
+    <h1 class="display-heading">One question.<br><em>Many perspectives.</em><br>Instant clarity.</h1>
+    <p class="subtitle">Simulate a full consumer focus group using AI personas — directional research insights in minutes, not weeks.</p>
+    <div class="hero-cta">
+      <button class="btn btn-primary" onclick="startFlow()">Run a Focus Group →</button>
+    </div>
+    <div class="hero-feats">
+      <div class="hero-feat"><div class="hero-feat-icon">◈</div><div class="hero-feat-lbl">Diverse AI personas per session</div></div>
+      <div class="hero-feat"><div class="hero-feat-icon">⟳</div><div class="hero-feat-lbl">Parallel simulation, ~30 seconds</div></div>
+      <div class="hero-feat"><div class="hero-feat-icon">◎</div><div class="hero-feat-lbl">Exec summary, themes & scores</div></div>
+      <div class="hero-feat"><div class="hero-feat-icon">⊞</div><div class="hero-feat-lbl">Save & reload past sessions</div></div>
+    </div>
+  </div>
+
+  <!-- SAVED SESSIONS -->
+  <div class="sessions-section" id="sessions-section">
+    <div class="sessions-section-header">
+      <div>
+        <div class="section-label">Saved Sessions</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="clear-all-btn" onclick="clearAllSessions()" style="display:none">Clear All</button>
+    </div>
+    <div class="sessions-grid" id="sessions-grid">
+      <div class="empty-sessions">
+        <div class="empty-sessions-icon">◈</div>
+        <div>No saved sessions yet.<br>Run a focus group and save your results.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BRIEF -->
+<div class="screen" id="screen-brief">
+  <div class="section-label">Step 01</div>
+  <h2 class="display-heading">Research <em>Brief</em></h2>
+  <p class="subtitle">Define what you want to learn. Be specific — your brief shapes the quality of insights.</p>
+
+  <!-- HOW TO -->
+  <div class="how-to open" id="how-to-banner">
+    <div class="how-to-toggle" onclick="this.closest('.how-to').classList.toggle('open')">
+      <div class="how-to-left">
+        <span style="font-size:14px">◈</span>
+        <span class="how-to-lbl">How to Prism</span>
+        <span class="how-to-badge">Guide</span>
+      </div>
+      <span class="how-to-chev">▾</span>
+    </div>
+    <div class="how-to-body">
+      <div class="how-to-steps">
+        <div class="how-to-step"><div class="how-to-step-num">01</div><div class="how-to-step-icon">✍️</div><div class="how-to-step-title">Write a Brief</div><div class="how-to-step-desc">Name your category and ask a specific question. Vague questions get vague insights.</div></div>
+        <div class="how-to-step"><div class="how-to-step-num">02</div><div class="how-to-step-icon">👥</div><div class="how-to-step-title">Review Panel</div><div class="how-to-step-desc">Prism builds a diverse panel. Swap any persona that doesn't fit your audience.</div></div>
+        <div class="how-to-step"><div class="how-to-step-num">03</div><div class="how-to-step-icon">⚡</div><div class="how-to-step-title">Simulate</div><div class="how-to-step-desc">All personas respond in parallel. Authentic characters — no groupthink.</div></div>
+        <div class="how-to-step"><div class="how-to-step-num">04</div><div class="how-to-step-icon">◎</div><div class="how-to-step-title">Read Insights</div><div class="how-to-step-desc">Exec summary, thematic clusters, scores, and recommended actions.</div></div>
+      </div>
+      <div class="how-to-tips">
+        <div class="how-to-tips-lbl">Tips for better results</div>
+        <div class="how-to-tip">Be specific — include price points, product details, or specific claims to test</div>
+        <div class="how-to-tip">Use Concept Testing for new ideas, Price Sensitivity when validating a price point</div>
+        <div class="how-to-tip">Results are directional, not definitive — use to guide decisions, not replace real research</div>
+        <div class="how-to-tip">Save sessions to compare findings across multiple runs</div>
+      </div>
+      <div class="how-to-tips" style="margin-top:10px">
+        <div class="how-to-tips-lbl">Works for personal decisions too</div>
+        <div class="how-to-tip">Choosing between colleges, neighborhoods, or job offers — test perception, not just facts</div>
+        <div class="how-to-tip">Salary negotiation — how does this offer read to a hiring manager, a peer, or a recruiter?</div>
+        <div class="how-to-tip">Big life decisions often hinge on how others perceive the options — Prism surfaces that</div>
+        <div class="how-to-tip">Pair Prism's perception layer with real data (stats, reviews) for the full picture</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="field-lbl">Product or Service Category</label>
+    <input type="text" id="i-cat" placeholder="e.g. Premium wireless headphones, Local ice cream shop, Luxury car subscription…" maxlength="120">
+  </div>
+
+  <div class="form-group">
+    <label class="field-lbl">Research Type</label>
+    <div class="type-grid">
+      <label class="type-card selected" id="tc-concept" onclick="selectType('concept')">
+        <input type="radio" name="rt" value="concept" checked>
+        <div class="type-card-header">
+          <div class="type-card-name">Concept Testing</div>
+          <i class="info-icon" onclick="toggleTip(event,'tip-concept')">i
+            <div class="tooltip-box" id="tip-concept">
+              <div class="tooltip-title">Concept Testing</div>
+              Best for evaluating new product ideas, features, or services before investing in development.
+              <div class="tooltip-ex">e.g. "We're launching a $49/mo subscription that replaces your gym membership. Would you switch?"</div>
+            </div>
+          </i>
+        </div>
+        <div class="type-card-desc">Evaluate product or feature ideas</div>
+      </label>
+      <label class="type-card" id="tc-price" onclick="selectType('price')">
+        <input type="radio" name="rt" value="price">
+        <div class="type-card-header">
+          <div class="type-card-name">Price Sensitivity</div>
+          <i class="info-icon" onclick="toggleTip(event,'tip-price')">i
+            <div class="tooltip-box" id="tip-price">
+              <div class="tooltip-title">Price Sensitivity</div>
+              Uses Van Westendorp methodology — each persona evaluates your price across four thresholds to find an acceptable range.
+              <div class="tooltip-ex">e.g. "A scoop of ice cream is $7. At what price does this seem too cheap, fair, expensive, or way too expensive?"</div>
+            </div>
+          </i>
+        </div>
+        <div class="type-card-desc">Find your acceptable price range</div>
+      </label>
+      <label class="type-card" id="tc-message" onclick="selectType('message')">
+        <input type="radio" name="rt" value="message">
+        <div class="type-card-header">
+          <div class="type-card-name">Message Testing</div>
+          <i class="info-icon" onclick="toggleTip(event,'tip-message')">i
+            <div class="tooltip-box" id="tip-message">
+              <div class="tooltip-title">Message Testing</div>
+              Test ad copy, taglines, or positioning. Each persona rates on clarity, relevance, and motivation to act.
+              <div class="tooltip-ex">e.g. "Which tagline lands better: 'Sound that disappears into your world' or 'The last headphone you'll ever need'?"</div>
+            </div>
+          </i>
+        </div>
+        <div class="type-card-desc">Test copy, taglines, positioning</div>
+      </label>
+      <label class="type-card" id="tc-open" onclick="selectType('open')">
+        <input type="radio" name="rt" value="open">
+        <div class="type-card-header">
+          <div class="type-card-name">Open Research</div>
+          <i class="info-icon" onclick="toggleTip(event,'tip-open')">i
+            <div class="tooltip-box" id="tip-open">
+              <div class="tooltip-title">Open Research</div>
+              Free-form exploration, AI-moderated. Best for discovery, category understanding, or questions that don't fit the other types.
+              <div class="tooltip-ex">e.g. "Walk me through how you decide to buy a new pair of headphones. What triggers the decision?"</div>
+            </div>
+          </i>
+        </div>
+        <div class="type-card-desc">Free-form, AI-moderated</div>
+      </label>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="field-lbl">Your Research Question</label>
+    <div class="chips-wrap">
+      <div class="chips-label">✦ Inspiration</div>
+      <div class="chips-row" id="chips-row"></div>
+    </div>
+    <textarea id="i-q" placeholder="Ask a specific question… or tap a chip above to get started."></textarea>
+  </div>
+
+  <div class="form-group">
+    <label class="field-lbl">Panel Size</label>
+    <div class="panel-size-row">
+      <input type="range" id="ps" min="4" max="12" value="8" oninput="document.getElementById('psv').textContent=this.value">
+      <span class="psv" id="psv">8</span>
+      <span style="font-size:12px;color:var(--text-faint)">personas</span>
+    </div>
+  </div>
+
+  <div id="brief-err" class="error-box" style="display:none"></div>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="brief-btn" onclick="submitBrief()">Build Panel →</button>
+    <button class="btn btn-ghost" onclick="goHome()">← Back</button>
+  </div>
+</div>
+
+<!-- PANEL -->
+<div class="screen" id="screen-panel">
+  <div class="section-label">Step 02</div>
+  <h2 class="display-heading">Your <em>Panel</em></h2>
+  <p class="subtitle" id="panel-sub">Review your focus group panel before running the simulation.</p>
+  <div class="panel-grid" id="panel-grid"></div>
+  <div id="panel-err" class="error-box" style="display:none"></div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="runSimulation()">Run Focus Group →</button>
+    <button class="btn btn-secondary" id="regen-btn" onclick="regenPanel()">↺ Regenerate</button>
+    <button class="btn btn-ghost" onclick="goToStep('brief',1)">← Brief</button>
+  </div>
+</div>
+
+<!-- RUNNING -->
+<div class="screen" id="screen-running">
+  <div class="section-label">Step 03</div>
+  <h2 class="display-heading">Simulating <em>Responses</em></h2>
+  <div class="status-bar">
+    <div><div class="running-label">Personas responding</div></div>
+    <div class="running-count"><span id="done-c">0</span> / <span id="tot-c">8</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+  </div>
+  <div class="running-grid" id="run-grid"></div>
+  <div id="synth-status" style="display:none;text-align:center;padding:20px;color:var(--text-muted);font-size:14px;">
+    <span class="spinner"></span> &nbsp; Synthesizing insights…
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="screen" id="screen-results">
+  <div style="margin-bottom:32px;padding-bottom:28px;border-bottom:1px solid var(--border)">
+    <div class="section-label">Research Findings</div>
+    <h2 class="display-heading" id="res-heading">Focus Group <em>Insights</em></h2>
+    <div class="export-row" style="margin-top:14px;flex-wrap:wrap;gap:8px;">
+      <button class="export-btn save-btn" id="save-btn" onclick="saveSession()">⊕ Save Session</button>
+      <button class="export-btn" id="copy-btn" onclick="copySummary()">⎘ Copy</button>
+      <button class="export-btn" onclick="exportTxt()">↓ TXT</button>
+      <button class="export-btn" onclick="exportEmail()">✉ Email</button>
+      <button class="export-btn" onclick="exportPDF()">⎙ PDF</button>
+      <button class="btn btn-ghost btn-sm" onclick="startOver()">↺ New</button>
+    </div>
+  </div>
+
+  <div class="exec-summary"><div class="exec-lbl">Executive Summary</div><div class="exec-text" id="exec-text"></div></div>
+  <div class="sec-div"><div class="sec-div-lbl">Recommended Actions</div><div class="sec-div-line"></div></div>
+  <div id="actions-list" style="margin-bottom:28px"></div>
+  <div class="sec-div"><div class="sec-div-lbl">Key Metrics</div><div class="sec-div-line"></div></div>
+  <div class="dashboard-grid" id="dash-grid"></div>
+  <div class="sec-div"><div class="sec-div-lbl">Purchase Intent by Persona</div><div class="sec-div-line"></div></div>
+  <div id="intent-chart" style="margin-bottom:28px"></div>
+  <div class="sec-div"><div class="sec-div-lbl">Thematic Clusters</div><div class="sec-div-line"></div></div>
+  <div class="themes-grid" id="themes-grid"></div>
+  <div class="sec-div"><div class="sec-div-lbl">Top Objections</div><div class="sec-div-line"></div></div>
+  <div id="obj-list" style="margin-bottom:28px"></div>
+  <div class="sec-div"><div class="sec-div-lbl">Segment Insights</div><div class="sec-div-line"></div></div>
+  <div class="segment-box" id="seg-box"></div>
+  <div class="limits-box" id="limits-box"></div>
+  <div class="raw-toggle" id="raw-toggle" onclick="toggleRaw()">
+    <span style="font-size:12px;color:var(--text-muted);font-family:'DM Mono',monospace">▤ Raw Persona Responses</span>
+    <span class="raw-icon">▾</span>
+  </div>
+  <div class="raw-wrap" id="raw-wrap">
+    <table><thead><tr>
+      <th>Persona</th><th>Warm-up</th><th>Core Response</th><th>Follow-up</th>
+      <th>Intent</th><th>WTP Low</th><th>WTP High</th><th>Top Objection</th>
+    </tr></thead><tbody id="raw-tbody"></tbody></table>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ── STATE ──
+const state = {
+  step:'home',
+  brief:{category:'',question:'',researchType:'concept',panelSize:8},
+  panel:[],responses:[],synthesis:null
+};
+
+const EMOJIS=['👩','👨','🧑','👴','👵','🧔','👩‍💼','👨‍💼','🧑‍🎓','👩‍🔬','👨‍🎨','🧑‍🍳'];
+
+const CHIPS={
+  concept:[
+    {i:'💡',t:'Would you try a new brand at this price point?'},
+    {i:'🆚',t:'How does this compare to what you currently use?'},
+    {i:'🎯',t:'Which of these features matters most to you?'},
+    {i:'🚀',t:'What would make you an early adopter of this?'},
+    {i:'🤔',t:"What's your biggest hesitation about switching?"},
+  ],
+  price:[
+    {i:'💰',t:'At what price does this feel like a steal? A fair deal? Too expensive?'},
+    {i:'📊',t:'How does this price compare to what you currently pay?'},
+    {i:'🏷️',t:'Would a subscription model change your willingness to pay?'},
+    {i:'💳',t:'What price would make you walk away without considering it?'},
+    {i:'🎁',t:'At what price would you buy this as a gift for someone?'},
+  ],
+  message:[
+    {i:'📣',t:'Which tagline resonates more with you and why?'},
+    {i:'💬',t:'Does this ad copy make you want to learn more?'},
+    {i:'🎨',t:'What emotion does this messaging make you feel?'},
+    {i:'🔍',t:'Is this positioning clear and believable to you?'},
+    {i:'⚡',t:'What single word best describes this brand message?'},
+  ],
+  open:[
+    {i:'🛒',t:'Walk me through how you decide to buy in this category.'},
+    {i:'😤',t:'What frustrates you most about the current options?'},
+    {i:'✨',t:'Describe your ideal experience with this product.'},
+    {i:'👀',t:'Where do you look for recommendations in this category?'},
+    {i:'🔄',t:'What would make you switch from your current solution?'},
+  ]
+};
+
+const RT_GUIDE={
+  price:'Apply Van Westendorp: at what price does this feel too cheap (quality concern), acceptable, expensive but worth it, and too expensive to consider?',
+  message:'Evaluate messaging on Clarity (1-5), Relevance (1-5), and Motivation to act (1-5). Explain each score.',
+  concept:'Evaluate honestly: what excites you, what concerns you, what questions remain?',
+  open:'Respond openly and personally, drawing on your own experiences and values.'
+};
+
+// ── NAV ──
+function goHome(){
+  setScreen('home');
+  document.getElementById('stepsBar').style.display='none';
+  renderSessions();
+}
+function startFlow(){
+  setScreen('brief');
+  document.getElementById('stepsBar').style.display='flex';
+  updateNav(1);
+  renderChips('concept');
+  // Collapse how-to after first use
+  const sessions=getSessions();
+  if(sessions.length>0) document.getElementById('how-to-banner').classList.remove('open');
+}
+function startOver(){state.panel=[];state.responses=[];state.synthesis=null;startFlow();}
+function goToStep(name,n){setScreen(name);updateNav(n);}
+function setScreen(n){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+n).classList.add('active');
+  state.step=n;window.scrollTo(0,0);
+}
+function updateNav(a){
+  for(let i=1;i<=4;i++){
+    const e=document.getElementById('sn'+i);
+    e.classList.remove('active','done');
+    if(i===a)e.classList.add('active');
+    else if(i<a)e.classList.add('done');
+  }
+}
+function toggleTheme(){
+  const h=document.documentElement;
+  h.setAttribute('data-theme',h.getAttribute('data-theme')==='dark'?'light':'dark');
+}
+
+// ── CHIPS ──
+function renderChips(type){
+  const row=document.getElementById('chips-row');
+  if(!row)return;
+  row.innerHTML='';
+  (CHIPS[type]||CHIPS.concept).forEach(c=>{
+    const el=document.createElement('div');
+    el.className='chip';
+    el.innerHTML=`<span>${c.i}</span>${c.t}`;
+    el.onclick=()=>{document.getElementById('i-q').value=c.t;document.getElementById('i-q').focus();};
+    row.appendChild(el);
+  });
+}
+
+// ── TYPE CARDS ──
+function selectType(t){
+  state.brief.researchType=t;
+  document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('tc-'+t).classList.add('selected');
+  renderChips(t);
+  document.getElementById('i-q').value='';
+}
+
+// ── TOOLTIPS ──
+function toggleTip(e,id){
+  e.stopPropagation();
+  const tip=document.getElementById(id);
+  const showing=tip.classList.contains('show');
+  document.querySelectorAll('.tooltip-box.show').forEach(t=>t.classList.remove('show'));
+  if(!showing)tip.classList.add('show');
+}
+document.addEventListener('click',()=>document.querySelectorAll('.tooltip-box.show').forEach(t=>t.classList.remove('show')));
+
+// ── BRIEF ──
+async function submitBrief(){
+  const cat=document.getElementById('i-cat').value.trim();
+  const q=document.getElementById('i-q').value.trim();
+  const err=document.getElementById('brief-err');
+  if(!cat){err.textContent='Please enter a product category.';err.style.display='block';return;}
+  if(!q){err.textContent='Please enter your research question.';err.style.display='block';return;}
+  err.style.display='none';
+  state.brief.category=cat;state.brief.question=q;
+  state.brief.panelSize=parseInt(document.getElementById('ps').value);
+  const btn=document.getElementById('brief-btn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Building panel…';
+  try{
+    await genPanel();
+    setScreen('panel');updateNav(2);
+  }catch(e){
+    err.textContent='Error: '+e.message;err.style.display='block';
+  }finally{btn.disabled=false;btn.innerHTML='Build Panel →';}
+}
+
+// ── PANEL GENERATION ──
+async function genPanel(){
+  const sys=`You are a JSON API. You output ONLY raw JSON. No markdown. No explanation. No code fences. Your response begins with [ and ends with ].`;
+  const prompt=`Generate ${state.brief.panelSize} focus group personas as a JSON array.
+Category: ${state.brief.category}
+Question: ${state.brief.question}
+Type: ${state.brief.researchType}
+
+Each object has these exact keys:
+- id: slug string
+- name: first name only
+- age: integer between 22 and 65
+- income_band: string like "$50k-$75k"
+- location_type: exactly "urban" or "suburban" or "rural"
+- occupation: brief string
+- values: array of exactly 3 strings
+- category_relationship: 1-2 sentences
+- likely_stance: 1 sentence
+- archetype: exactly one of these values: Value Maximizer, Status Seeker, Reluctant Upgrader, Practical Optimizer, Lifestyle Aligner, Social Validator, Power User, Budget Stretcher, Skeptic, Loyalist
+
+Requirements: diverse ages 22-65, mixed income bands, mixed location types, include at least one Skeptic, each persona gets a unique archetype, personas should genuinely disagree with each other.`;
+
+  const data=await callClaude([{role:'user',content:prompt}],0.85,2800,sys);
+  state.panel=safeParseJSON(data.content[0].text);
+  renderPanel();
+}
+
+function safeParseJSON(raw){
+  if(!raw||typeof raw!=='string') throw new Error('Empty API response');
+  // Strip fences
+  let s=raw.replace(/```json/gi,'').replace(/```/g,'').trim();
+  // Try direct
+  try{return JSON.parse(s);}catch(e){}
+  // Find array
+  const a1=s.indexOf('['),a2=s.lastIndexOf(']');
+  if(a1!==-1&&a2>a1){try{return JSON.parse(s.slice(a1,a2+1));}catch(e){}}
+  // Find object
+  const o1=s.indexOf('{'),o2=s.lastIndexOf('}');
+  if(o1!==-1&&o2>o1){try{return JSON.parse(s.slice(o1,o2+1));}catch(e){}}
+  throw new Error('Could not parse response. Raw: '+s.slice(0,200));
+}
+
+function renderPanel(){
+  const g=document.getElementById('panel-grid');g.innerHTML='';
+  state.panel.forEach((p,i)=>{
+    const c=document.createElement('div');c.className='persona-card';c.style.animationDelay=(i*.05)+'s';
+    c.innerHTML=`<button class="persona-regen" onclick="regenOne(${i})" title="Regenerate">↺</button>
+      <div class="persona-avatar">${EMOJIS[i%EMOJIS.length]}</div>
+      <div class="persona-name">${p.name}</div>
+      <div class="persona-meta">${p.age} · ${p.income_band} · ${p.location_type}</div>
+      <div class="persona-meta" style="margin-bottom:8px">${p.occupation}</div>
+      <div class="persona-archetype">${p.archetype}</div>
+      <div class="persona-stance">"${p.likely_stance}"</div>`;
+    g.appendChild(c);
+  });
+  document.getElementById('panel-sub').textContent=`${state.panel.length} personas assembled. Review and regenerate any that don't fit.`;
+}
+
+async function regenOne(i){
+  const old=state.panel[i];
+  try{
+    const sys=`You are a JSON API. Output ONLY a single JSON object. No markdown. No explanation. Start with {.`;
+    const data=await callClaude([{role:'user',content:`Generate ONE replacement focus group persona for "${state.brief.category}". The replaced persona was: ${old.archetype} — ${old.likely_stance}. Generate a DIFFERENT archetype with a different stance. Same JSON keys: id, name, age, income_band, location_type, occupation, values (array of 3), category_relationship, likely_stance, archetype.`}],0.9,700,sys);
+    state.panel[i]=safeParseJSON(data.content[0].text);
+    renderPanel();
+  }catch(e){console.error('Regen error',e);}
+}
+
+async function regenPanel(){
+  const b=document.getElementById('regen-btn');b.disabled=true;b.innerHTML='<span class="spinner"></span> Regenerating…';
+  try{await genPanel();}catch(e){showError(document.getElementById('panel-err'),e.message);}
+  finally{b.disabled=false;b.innerHTML='↺ Regenerate';}
+}
+
+// ── SIMULATION ──
+async function runSimulation(){
+  setScreen('running');updateNav(3);
+  const g=document.getElementById('run-grid');g.innerHTML='';
+  state.responses=[];
+  document.getElementById('tot-c').textContent=state.panel.length;
+  document.getElementById('done-c').textContent='0';
+  document.getElementById('prog').style.width='0%';
+
+  state.panel.forEach((p,i)=>{
+    const c=document.createElement('div');c.className='sim-card pending';c.id='sc'+i;
+    c.innerHTML=`<div><div class="sim-name">${p.name}</div><div class="sim-meta">${p.archetype}</div></div>
+      <div class="sim-status pending" id="ss${i}"><div class="dot"></div> Waiting</div>`;
+    g.appendChild(c);
+  });
+
+  let done=0;
+  const promises=state.panel.map(async(p,i)=>{
+    await new Promise(r=>setTimeout(r,i*120));
+    const c=document.getElementById('sc'+i),s=document.getElementById('ss'+i);
+    if(c){c.classList.remove('pending');c.classList.add('running');}
+    if(s){s.className='sim-status running';s.innerHTML='<div class="dot running"></div> Responding…';}
+
+    const sys=`You are ${p.name}, a ${p.age}-year-old ${p.occupation} in a ${p.location_type} area. Income: ${p.income_band}. Values: ${(p.values||[]).join(', ')}. Category relationship: ${p.category_relationship}. Stay fully in character — authentic and opinionated. RESPOND ONLY WITH A JSON OBJECT. Start with { and end with }. No other text.`;
+    const usr=`Focus group: ${state.brief.category}. ${RT_GUIDE[state.brief.researchType]||RT_GUIDE.open}
+
+Three questions — think before answering:
+1. WARM-UP: Your current situation with ${state.brief.category}?
+2. CORE: ${state.brief.question} — think out loud, honest reaction.
+3. FOLLOW-UP: What single change would shift your answer positively?
+
+Respond with exactly: {"warmup":"2-3 sentences","core":"3-5 sentences thinking out loud","followup":"1-2 sentences","purchase_intent":<integer 1-10>,"wtp_low":<number>,"wtp_high":<number>,"top_objection":"one sentence"}`;
+
+    try{
+      const data=await callClaude([{role:'user',content:usr}],0.75,950,sys);
+      const r=safeParseJSON(data.content[0].text);
+      r.personaName=p.name;r.archetype=p.archetype;r.personaId=p.id;
+      state.responses.push(r);
+      if(c){c.classList.remove('running');c.classList.add('done');}
+      if(s){s.className='sim-status done';s.innerHTML='<div class="dot"></div> Done';}
+    }catch(e){
+      console.error('Sim error',p.name,e);
+      state.responses.push({personaName:p.name,archetype:p.archetype,personaId:p.id,warmup:'Error.',core:'Error.',followup:'Error.',purchase_intent:5,wtp_low:0,wtp_high:0,top_objection:'Unavailable'});
+      if(c){c.classList.remove('running');c.classList.add('error');}
+      if(s){s.className='sim-status error';s.innerHTML='<div class="dot"></div> Error';}
+    }
+    done++;
+    document.getElementById('done-c').textContent=done;
+    document.getElementById('prog').style.width=((done/state.panel.length)*75)+'%';
+  });
+
+  await Promise.all(promises);
+  document.getElementById('prog').style.width='85%';
+  document.getElementById('synth-status').style.display='block';
+
+  try{
+    await synthesize();
+    document.getElementById('prog').style.width='100%';
+    setTimeout(()=>{renderResults();setScreen('results');updateNav(4);},400);
+  }catch(e){
+    document.getElementById('synth-status').innerHTML=`<span style="color:var(--accent3)">Synthesis error: ${e.message}</span>`;
+  }
+}
+
+// ── SYNTHESIS ──
+async function synthesize(){
+  const summary=state.responses.map(r=>`${r.personaName} (${r.archetype}):\nWarmup: ${r.warmup}\nCore: ${r.core}\nFollowup: ${r.followup}\nIntent: ${r.purchase_intent}/10\nWTP: $${r.wtp_low}-$${r.wtp_high}\nObjection: ${r.top_objection}`).join('\n\n---\n\n');
+  const sys=`You are a JSON API. Output ONLY a valid JSON object. No markdown. No explanation. Start with {.`;
+  const prompt=`Senior consumer insights analyst. Synthesize ${state.responses.length} focus group responses.
+Category: ${state.brief.category} | Question: ${state.brief.question} | Type: ${state.brief.researchType}
+
+${summary}
+
+Find the real story — tensions, surprises, clear signals.
+
+Output JSON with exactly these keys:
+{"executive_summary":"3-4 paragraph CMO narrative: dominant finding, key tension, surprising outlier, strategic implication","themes":[{"name":"Memorable 3-5 word name","description":"one sentence","persona_count":1,"representative_quote":"direct quote","persona_names":["name"]}],"segment_insights":"2 paragraphs on how responses differed by segment","recommended_actions":["action 1","action 2","action 3"],"avg_purchase_intent":7.5,"wtp_range":{"low":200,"high":400},"key_objections":["obj1","obj2","obj3"],"limitations":"2 sentences on synthetic research limitations."}
+
+Generate 4-6 themes with specific memorable names.`;
+
+  const data=await callClaude([{role:'user',content:prompt}],0.4,2500,sys);
+  state.synthesis=safeParseJSON(data.content[0].text);
+}
+
+// ── RENDER RESULTS ──
+function renderResults(){
+  const s=state.synthesis,r=state.responses;
+  document.getElementById('res-heading').innerHTML=`<em>${state.brief.category}</em> — Insights`;
+  document.getElementById('exec-text').innerHTML=s.executive_summary.split('\n').filter(p=>p.trim()).map(p=>`<p>${p}</p>`).join('');
+  document.getElementById('actions-list').innerHTML=(s.recommended_actions||[]).map((a,i)=>`<div class="action-item"><div class="action-num">0${i+1}</div><div class="action-text">${a}</div></div>`).join('');
+
+  const pos=r.filter(x=>(x.purchase_intent||0)>=6).length;
+  document.getElementById('dash-grid').innerHTML=`
+    <div class="metric-card"><div class="metric-label">Avg Intent</div><div class="metric-value">${s.avg_purchase_intent}<span style="font-size:16px;color:var(--text-muted)">/10</span></div><div class="metric-sub">${r.length} personas</div></div>
+    <div class="metric-card"><div class="metric-label">WTP Range</div><div class="metric-value" style="font-size:20px">$${s.wtp_range.low}–$${s.wtp_range.high}</div><div class="metric-sub">Acceptable window</div></div>
+    <div class="metric-card"><div class="metric-label">Positive Lean</div><div class="metric-value">${Math.round((pos/r.length)*100)}<span style="font-size:16px;color:var(--text-muted)">%</span></div><div class="metric-sub">Intent ≥ 6/10</div></div>`;
+
+  const sorted=[...r].sort((a,b)=>(b.purchase_intent||0)-(a.purchase_intent||0));
+  document.getElementById('intent-chart').innerHTML=sorted.map(x=>{
+    const pct=((x.purchase_intent||5)/10)*100;
+    const col=(x.purchase_intent||5)>=7?'var(--success)':(x.purchase_intent||5)>=4?'var(--accent)':'var(--accent3)';
+    return `<div class="intent-bar-row"><div class="intent-bar-name">${x.personaName}</div><div class="intent-bar-track"><div class="intent-bar-fill" data-p="${pct}" style="background:${col}"></div></div><div class="intent-bar-val">${x.purchase_intent}</div></div>`;
+  }).join('');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelectorAll('.intent-bar-fill').forEach(b=>b.style.width=b.dataset.p+'%')));
+
+  document.getElementById('themes-grid').innerHTML=(s.themes||[]).map(t=>`<div class="theme-card"><div class="theme-name">${t.name}</div><div class="theme-desc">${t.description}</div><div class="theme-quote">${t.representative_quote}</div><div class="theme-count">${t.persona_count} persona${t.persona_count!==1?'s':''} · ${(t.persona_names||[]).join(', ')}</div></div>`).join('');
+  document.getElementById('obj-list').innerHTML=(s.key_objections||[]).map(o=>`<span class="objection-tag">⚑ ${o}</span>`).join('');
+  document.getElementById('seg-box').textContent=s.segment_insights||'';
+  document.getElementById('limits-box').innerHTML=`<strong>Research Limitations</strong><br>${s.limitations||''}`;
+  document.getElementById('raw-tbody').innerHTML=r.map(x=>`<tr><td class="td-name">${x.personaName}<br><span style="font-size:9px;color:var(--text-faint);font-family:'DM Mono',monospace">${x.archetype}</span></td><td>${x.warmup}</td><td>${x.core}</td><td>${x.followup}</td><td><span class="score-pill">${x.purchase_intent}/10</span></td><td style="font-family:'DM Mono',monospace;font-size:11px">$${x.wtp_low}</td><td style="font-family:'DM Mono',monospace;font-size:11px">$${x.wtp_high}</td><td>${x.top_objection}</td></tr>`).join('');
+
+  // Reset save button
+  const sb=document.getElementById('save-btn');
+  sb.className='export-btn save-btn';sb.innerHTML='⊕ Save Session';sb.onclick=saveSession;
+}
+
+// ── EXPORTS ──
+function buildReportText(){
+  const s=state.synthesis;
+  return [
+    `╔══════════════════════════════════════╗`,
+    `  PRISM FOCUS GROUP REPORT`,
+    `╚══════════════════════════════════════╝`,
+    ``,
+    `Category: ${state.brief.category}`,
+    `Question: ${state.brief.question}`,
+    `Research Type: ${state.brief.researchType}`,
+    `Panel Size: ${state.responses.length} personas`,
+    `Date: ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}`,
+    ``,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    `EXECUTIVE SUMMARY`,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    ``,
+    s.executive_summary,
+    ``,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    `RECOMMENDED ACTIONS`,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    ``,
+    s.recommended_actions.map((a,i)=>`${i+1}. ${a}`).join('\n'),
+    ``,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    `KEY METRICS`,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    ``,
+    `Avg Purchase Intent: ${s.avg_purchase_intent}/10`,
+    `Willingness to Pay: $${s.wtp_range.low} – $${s.wtp_range.high}`,
+    `Positive Lean: ${Math.round((state.responses.filter(r=>r.purchase_intent>=6).length/state.responses.length)*100)}%`,
+    ``,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    `THEMATIC CLUSTERS`,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    ``,
+    s.themes.map(t=>`▪ ${t.name}\n  ${t.description}\n  "${t.representative_quote}"\n  Personas: ${(t.persona_names||[]).join(', ')}`).join('\n\n'),
+    ``,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    `TOP OBJECTIONS`,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    ``,
+    s.key_objections.map(o=>`⚑ ${o}`).join('\n'),
+    ``,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    `SEGMENT INSIGHTS`,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    ``,
+    s.segment_insights,
+    ``,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    `RESEARCH LIMITATIONS`,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    ``,
+    s.limitations,
+    ``,
+    `Generated by Prism — synthetic focus groups`,
+  ].join('\n');
+}
+
+function copySummary(){
+  navigator.clipboard.writeText(buildReportText()).then(()=>{
+    const b=document.getElementById('copy-btn');
+    b.classList.add('copied');b.textContent='✓ Copied';
+    setTimeout(()=>{b.classList.remove('copied');b.innerHTML='⎘ Copy';},2000);
+  });
+}
+
+function exportTxt(){
+  const blob=new Blob([buildReportText()],{type:'text/plain'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`prism-${state.brief.category.toLowerCase().replace(/\s+/g,'-')}-${Date.now()}.txt`;
+  a.click();URL.revokeObjectURL(a.href);
+}
+
+function exportEmail(){
+  const s=state.synthesis;
+  const subject=encodeURIComponent(`Prism Research: ${state.brief.category}`);
+  const body=encodeURIComponent([
+    `Hi,`,``,
+    `Sharing the Prism focus group results for: ${state.brief.category}`,``,
+    `Question tested: ${state.brief.question}`,``,
+    `KEY FINDINGS`,
+    `• Avg Purchase Intent: ${s.avg_purchase_intent}/10`,
+    `• WTP Range: $${s.wtp_range.low}–$${s.wtp_range.high}`,
+    `• Positive Lean: ${Math.round((state.responses.filter(r=>r.purchase_intent>=6).length/state.responses.length)*100)}%`,``,
+    `EXECUTIVE SUMMARY`,
+    s.executive_summary,``,
+    `TOP RECOMMENDATIONS`,
+    s.recommended_actions.map((a,i)=>`${i+1}. ${a}`).join('\n'),``,
+    `KEY THEMES`,
+    s.themes.map(t=>`• ${t.name}: ${t.description}`).join('\n'),``,
+    `NOTE: ${s.limitations}`,``,
+    `Generated by Prism`
+  ].join('\n'));
+  window.location.href=`mailto:?subject=${subject}&body=${body}`;
+}
+
+function exportPDF(){
+  window.print();
+}
+
+// ── SESSIONS (localStorage) ──
+const STORAGE_KEY='prism_sessions';
+
+function getSessions(){
+  try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');}
+  catch(e){return[];}
+}
+
+function saveSessions(sessions){
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(sessions));
+}
+
+function saveSession(){
+  const s=state.synthesis;
+  const session={
+    id:'s_'+Date.now(),
+    timestamp:Date.now(),
+    brief:{...state.brief},
+    responses:[...state.responses],
+    synthesis:{...state.synthesis}
+  };
+  const sessions=getSessions();
+  sessions.unshift(session);
+  // Keep max 20 sessions
+  if(sessions.length>20)sessions.pop();
+  saveSessions(sessions);
+
+  const btn=document.getElementById('save-btn');
+  btn.className='export-btn saved-btn';
+  btn.innerHTML='✓ Saved';
+  btn.onclick=null;
+}
+
+function loadSession(id){
+  const sessions=getSessions();
+  const session=sessions.find(s=>s.id===id);
+  if(!session)return;
+  state.brief={...session.brief};
+  state.responses=[...session.responses];
+  state.synthesis={...session.synthesis};
+  state.panel=[];
+  renderResults();
+  setScreen('results');
+  document.getElementById('stepsBar').style.display='flex';
+  updateNav(4);
+  // Mark save button as already saved
+  const btn=document.getElementById('save-btn');
+  btn.className='export-btn saved-btn';
+  btn.innerHTML='✓ Saved';btn.onclick=null;
+}
+
+function deleteSession(id,e){
+  e.stopPropagation();
+  const sessions=getSessions().filter(s=>s.id!==id);
+  saveSessions(sessions);
+  renderSessions();
+}
+
+function clearAllSessions(){
+  if(confirm('Delete all saved sessions?')){
+    localStorage.removeItem(STORAGE_KEY);
+    renderSessions();
+  }
+}
+
+function renderSessions(){
+  const sessions=getSessions();
+  const grid=document.getElementById('sessions-grid');
+  const clearBtn=document.getElementById('clear-all-btn');
+
+  if(sessions.length===0){
+    grid.innerHTML=`<div class="empty-sessions"><div class="empty-sessions-icon">◈</div><div>No saved sessions yet.<br>Run a focus group and save your results.</div></div>`;
+    clearBtn.style.display='none';
+    return;
+  }
+
+  clearBtn.style.display='inline-flex';
+  grid.innerHTML=sessions.map(s=>{
+    const date=new Date(s.timestamp).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const intent=s.synthesis?.avg_purchase_intent||'—';
+    const typeLabel={concept:'Concept',price:'Pricing',message:'Message',open:'Open'}[s.brief.researchType]||s.brief.researchType;
+    return `
+      <div class="session-card" onclick="loadSession('${s.id}')">
+        <button class="session-delete" onclick="deleteSession('${s.id}',event)" title="Delete">×</button>
+        <div class="session-card-category">${s.brief.category}</div>
+        <div class="session-card-q">${s.brief.question}</div>
+        <div class="session-card-meta">
+          <span class="session-card-date">${date}</span>
+          <span class="session-card-intent">${intent}/10 intent</span>
+          <span class="session-card-type">${typeLabel}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── RAW TOGGLE ──
+function toggleRaw(){
+  document.getElementById('raw-toggle').classList.toggle('open');
+  document.getElementById('raw-wrap').classList.toggle('open');
+}
+
+// ── CLAUDE API ──
+async function callClaude(messages,temperature=0.7,maxTokens=1000,systemPrompt=null){
+  const body={model:'claude-sonnet-4-20250514',max_tokens:maxTokens,temperature,messages};
+  if(systemPrompt)body.system=systemPrompt;
+  const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!response.ok){const e=await response.text();throw new Error(`API ${response.status}: ${e}`);}
+  return response.json();
+}
+
+function showError(el,msg){el.textContent=msg;el.style.display='block';}
+
+// ── INIT ──
+renderSessions();
+</script>
+</body>
+</html>
