@@ -66,8 +66,8 @@
 
   /* TYPE CARDS */
   .type-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;}
-  @media(max-width:480px){.type-grid{grid-template-columns:1fr;}}
-  .type-card{border:1px solid var(--border);border-radius:var(--radius);padding:13px 15px;cursor:pointer;transition:all .15s;background:var(--bg2);position:relative;}
+  @media(max-width:360px){.type-grid{grid-template-columns:1fr;}}
+  .type-card{border:1px solid var(--border);border-radius:var(--radius);padding:12px 13px;cursor:pointer;transition:all .15s;background:var(--bg2);position:relative;}
   .type-card:hover{border-color:var(--border-light);background:var(--bg3);}
   .type-card.selected{border-color:var(--accent);background:rgba(200,181,96,.06);}
   .type-card input{display:none;}
@@ -410,23 +410,77 @@
   [data-theme="light"] .hero::before{background:radial-gradient(ellipse at 50% 30%,rgba(120,95,16,.06) 0%,rgba(42,127,168,.04) 40%,transparent 70%);}
   [data-theme="light"] .hero-pill{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.08);}
 
-  /* PRINT STYLES */
+  /* PRINT STYLES — ink-efficient, white background */
   @media print {
-    header,.steps-bar,.btn-row,.export-row,.raw-toggle,.raw-wrap,.how-to,
-    .copy-btn,.theme-btn,.persona-regen{display:none!important;}
-    body{background:#fff!important;color:#000!important;font-size:12px;}
-    .screen{display:block!important;}
+    /* Hide everything except results */
+    header,.steps-bar,.btn-row,.export-row,.raw-toggle,.raw-wrap,
+    .how-to,.theme-btn,.persona-regen,.disclaimer-banner,
     #screen-home,#screen-brief,#screen-panel,#screen-running{display:none!important;}
+
+    /* Force white everywhere */
+    *{background:white!important;color:#111!important;border-color:#ddd!important;box-shadow:none!important;}
+    body{font-size:11px;line-height:1.5;}
+    .screen{display:none!important;}
     #screen-results{display:block!important;}
     main{padding:0!important;max-width:100%!important;}
-    .exec-summary,.metric-card,.theme-card,.segment-box{background:#f9f9f9!important;border-color:#ddd!important;break-inside:avoid;}
-    .display-heading{font-size:22px!important;}
-    .exec-text{font-size:11px!important;}
-    .metric-value{font-size:22px!important;}
-    .prism-line{background:linear-gradient(90deg,#c8b560,#6ab0d4,#a06ac8,#c46060)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-    .exec-summary::before{background:linear-gradient(90deg,#c8b560,#6ab0d4,#a06ac8,#c46060)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+
+    /* Typography */
+    .display-heading{font-size:20px!important;color:#111!important;}
+    .display-heading em,#res-heading span{color:#7a5f10!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .section-label,.sec-div-lbl,.exec-lbl,.metric-label{color:#666!important;font-size:9px!important;}
+    .exec-text{font-size:11px!important;color:#222!important;}
+    .text-muted,.subtitle{color:#555!important;}
+
+    /* Cards — no backgrounds, just borders */
+    .exec-summary,.metric-card,.theme-card,.segment-box,.limits-box{
+      background:white!important;border:1px solid #ddd!important;
+      break-inside:avoid;margin-bottom:12px!important;padding:14px!important;
+    }
+    .exec-summary::before{
+      background:linear-gradient(90deg,#c8b560,#6ab0d4,#a06ac8,#c46060)!important;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact;
+    }
+
+    /* Metrics row */
+    .dashboard-grid{grid-template-columns:repeat(3,1fr)!important;gap:8px!important;}
+    .metric-value{font-size:22px!important;color:#7a5f10!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+
+    /* Intent bars */
+    .intent-bar-track{background:#eee!important;}
     .intent-bar-fill{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-    @page{margin:1.5cm;size:A4;}
+    .intent-bar-name{color:#333!important;}
+    .intent-bar-val{color:#333!important;}
+
+    /* Themes grid */
+    .themes-grid{grid-template-columns:repeat(2,1fr)!important;}
+    .theme-name{color:#111!important;}
+    .theme-quote{border-left-color:#c8b560!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+
+    /* Objection tags */
+    .objection-tag{background:none!important;border-color:#bbb!important;color:#555!important;}
+
+    /* Actions */
+    .action-num{color:#7a5f10!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+
+    /* Dividers */
+    .sec-div-line{background:#ddd!important;}
+
+    /* Hide WTP tooltips and info icons in print */
+    .wtp-info,.tooltip-box,.info-icon{display:none!important;}
+
+    /* Segment box */
+    .segment-box{color:#333!important;}
+
+    /* Limitations */
+    .limits-box{background:#f8f8f8!important;border-color:#ddd!important;}
+
+    /* Score pills */
+    .score-pill{background:#eee!important;color:#333!important;}
+
+    /* Type tag */
+    #res-type-tag{background:#eee!important;color:#666!important;}
+
+    @page{margin:1.8cm 1.5cm;size:A4;}
   }
 
   ::-webkit-scrollbar{width:5px;height:5px;}
@@ -516,7 +570,7 @@
   <p class="subtitle">Define what you want to learn. Be specific — your brief shapes the quality of insights.</p>
 
   <!-- HOW TO -->
-  <div class="how-to open" id="how-to-banner">
+  <div class="how-to" id="how-to-banner">
     <div class="how-to-toggle" onclick="this.closest('.how-to').classList.toggle('open')">
       <div class="how-to-left">
         <span style="font-size:14px">◈</span>
@@ -819,9 +873,14 @@ function startFlow(){
   document.getElementById('stepsBar').style.display='flex';
   updateNav(1);
   renderChips('concept');
-  // Collapse how-to after first use
+  // Open how-to for first-time users, keep closed for returning users
   const sessions=getSessions();
-  if(sessions.length>0) document.getElementById('how-to-banner').classList.remove('open');
+  const banner=document.getElementById('how-to-banner');
+  if(sessions.length===0){
+    banner.classList.add('open');
+  } else {
+    banner.classList.remove('open');
+  }
 }
 function startOver(){if(state.synthesis&&!confirm('Start a new focus group? Your current results will be lost if unsaved.'))return;state.panel=[];state.responses=[];state.synthesis=null;startFlow();}
 function goToStep(name,n){setScreen(name);updateNav(n);}
@@ -873,15 +932,29 @@ function showTip(e, id) {
   e.stopImmediatePropagation();
   const tip = document.getElementById(id);
   const already = tip.classList.contains('show');
-  // Close all
   document.querySelectorAll('.tooltip-box.show').forEach(t => t.classList.remove('show'));
   if (already) return;
-  // Position near the icon
+  // Make visible but hidden to measure height
+  tip.style.visibility = 'hidden';
+  tip.style.display = 'block';
+  const tipH = tip.offsetHeight;
+  const tipW = tip.offsetWidth;
+  tip.style.visibility = '';
+  tip.style.display = '';
   const rect = e.target.getBoundingClientRect();
-  tip.style.top = (rect.bottom + window.scrollY + 8) + 'px';
-  // Keep within viewport
-  const left = Math.min(rect.left + window.scrollX - 10, window.innerWidth - 280);
-  tip.style.left = Math.max(10, left) + 'px';
+  const spaceBelow = window.innerHeight - rect.bottom;
+  const spaceAbove = rect.top;
+  // Flip upward if not enough space below
+  let top;
+  if (spaceBelow < tipH + 16 && spaceAbove > tipH + 16) {
+    top = rect.top + window.scrollY - tipH - 8;
+  } else {
+    top = rect.bottom + window.scrollY + 8;
+  }
+  // Keep within horizontal viewport
+  const left = Math.min(Math.max(10, rect.left + window.scrollX - 10), window.innerWidth - tipW - 10);
+  tip.style.top = top + 'px';
+  tip.style.left = left + 'px';
   tip.classList.add('show');
   return false;
 }
@@ -910,7 +983,7 @@ async function submitBrief(){
     await genPanel();
     setScreen('panel');updateNav(2);
   }catch(e){
-    err.textContent='Error: '+e.message;err.style.display='block';
+    err.innerHTML='<strong>Error:</strong> '+e.message;err.style.display='block';
   }finally{btn.disabled=false;btn.innerHTML='Build Panel →';}
 }
 
@@ -1074,6 +1147,9 @@ Generate 4-6 themes with specific memorable names.`;
 
 // ── RENDER RESULTS ──
 function renderResults(){
+  if(!state.synthesis||!state.responses||!state.responses.length){
+    setScreen('home');goHome();return;
+  }
   const s=state.synthesis,r=state.responses;
   window.scrollTo(0,0);
   const typeLabels={concept:'Concept Test',price:'Price Sensitivity',message:'Message Test',open:'Open Research'};
@@ -1110,73 +1186,76 @@ function renderResults(){
 // ── EXPORTS ──
 function buildReportText(){
   const s=state.synthesis;
-  return [
-    `╔══════════════════════════════════════╗`,
-    `  PRISM FOCUS GROUP REPORT`,
-    `╚══════════════════════════════════════╝`,
-    ``,
-    `Category: ${state.brief.category}`,
-    `Question: ${state.brief.question}`,
-    `Research Type: ${state.brief.researchType}`,
-    `Panel Size: ${state.responses.length} personas`,
-    `Date: ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}`,
-    ``,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    `EXECUTIVE SUMMARY`,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    ``,
+  const div='--------------------------------------------------';
+  const typeLabel={concept:'Concept Testing',price:'Price Sensitivity',message:'Message Testing',open:'Open Research'}[state.brief.researchType]||state.brief.researchType;
+  const posLean=Math.round((state.responses.filter(r=>r.purchase_intent>=6).length/state.responses.length)*100);
+  const lines=[
+    'PRISM FOCUS GROUP REPORT',
+    div,
+    '',
+    'Category:      '+state.brief.category,
+    'Question:      '+state.brief.question,
+    'Research Type: '+typeLabel,
+    'Panel Size:    '+state.responses.length+' personas',
+    'Date:          '+new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),
+    '',
+    div,
+    'EXECUTIVE SUMMARY',
+    div,
+    '',
     s.executive_summary,
-    ``,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    `RECOMMENDED ACTIONS`,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    ``,
-    s.recommended_actions.map((a,i)=>`${i+1}. ${a}`).join('\n'),
-    ``,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    `KEY METRICS`,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    ``,
-    `Avg Purchase Intent: ${s.avg_purchase_intent}/10`,
-    `Willingness to Pay: $${s.wtp_range.low} – $${s.wtp_range.high}`,
-    `Positive Lean: ${Math.round((state.responses.filter(r=>r.purchase_intent>=6).length/state.responses.length)*100)}%`,
-    ``,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    `THEMATIC CLUSTERS`,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    ``,
-    s.themes.map(t=>`▪ ${t.name}\n  ${t.description}\n  "${t.representative_quote}"\n  Personas: ${(t.persona_names||[]).join(', ')}`).join('\n\n'),
-    ``,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    `TOP OBJECTIONS`,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    ``,
-    s.key_objections.map(o=>`⚑ ${o}`).join('\n'),
-    ``,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    `SEGMENT INSIGHTS`,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    ``,
+    '',
+    div,
+    'KEY METRICS',
+    div,
+    '',
+    'Avg Purchase Intent: '+s.avg_purchase_intent+'/10',
+    'Willingness to Pay:  $'+fmtNum(s.wtp_range.low)+' - $'+fmtNum(s.wtp_range.high),
+    'Positive Lean:       '+posLean+'%',
+    '',
+    div,
+    'RECOMMENDED ACTIONS',
+    div,
+    '',
+    s.recommended_actions.map((a,i)=>(i+1)+'. '+a).join('
+'),
+    '',
+    div,
+    'THEMATIC CLUSTERS',
+    div,
+    '',
+    s.themes.map(t=>'>> '+t.name+'
+   '+t.description+'
+   "'+t.representative_quote+'"
+   Personas: '+(t.persona_names||[]).join(', ')).join('
+
+'),
+    '',
+    div,
+    'TOP OBJECTIONS',
+    div,
+    '',
+    s.key_objections.map(o=>'* '+o).join('
+'),
+    '',
+    div,
+    'SEGMENT INSIGHTS',
+    div,
+    '',
     s.segment_insights,
-    ``,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    `RESEARCH LIMITATIONS`,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    ``,
+    '',
+    div,
+    'RESEARCH LIMITATIONS',
+    div,
+    '',
     s.limitations,
-    ``,
-    `Generated by Prism — synthetic focus groups`,
-  ].join('\n');
+    '',
+    div,
+    'Generated by Prism | AI-simulated research. Directional only.',
+  ];
+  return lines.join('
+');
 }
-
-function copySummary(){
-  navigator.clipboard.writeText(buildReportText()).then(()=>{
-    const b=document.getElementById('copy-btn');
-    b.classList.add('copied');b.textContent='✓ Copied';
-    setTimeout(()=>{b.classList.remove('copied');b.innerHTML='⎘ Copy';},2000);
-  });
-}
-
 function exportTxt(){
   const blob=new Blob([buildReportText()],{type:'text/plain'});
   const a=document.createElement('a');
@@ -1187,25 +1266,60 @@ function exportTxt(){
 
 function exportEmail(){
   const s=state.synthesis;
-  const subject=encodeURIComponent(`Prism Research: ${state.brief.category}`);
-  const body=encodeURIComponent([
-    `Hi,`,``,
-    `Sharing the Prism focus group results for: ${state.brief.category}`,``,
-    `Question tested: ${state.brief.question}`,``,
-    `KEY FINDINGS`,
-    `• Avg Purchase Intent: ${s.avg_purchase_intent}/10`,
-    `• WTP Range: $${s.wtp_range.low}–$${s.wtp_range.high}`,
-    `• Positive Lean: ${Math.round((state.responses.filter(r=>r.purchase_intent>=6).length/state.responses.length)*100)}%`,``,
-    `EXECUTIVE SUMMARY`,
-    s.executive_summary,``,
-    `TOP RECOMMENDATIONS`,
-    s.recommended_actions.map((a,i)=>`${i+1}. ${a}`).join('\n'),``,
-    `KEY THEMES`,
-    s.themes.map(t=>`• ${t.name}: ${t.description}`).join('\n'),``,
-    `NOTE: ${s.limitations}`,``,
-    `Generated by Prism`
-  ].join('\n'));
-  window.location.href=`mailto:?subject=${subject}&body=${body}`;
+  const posLean=Math.round((state.responses.filter(r=>r.purchase_intent>=6).length/state.responses.length)*100);
+  const typeLabel={concept:'Concept Testing',price:'Price Sensitivity',message:'Message Testing',open:'Open Research'}[state.brief.researchType]||state.brief.researchType;
+  const nl='%0A';
+  const lines=[
+    'Prism Focus Group Results: '+state.brief.category,
+    '',
+    'Hi,',
+    '',
+    'Here are the Prism AI focus group findings for the following research:',
+    '',
+    'Category: '+state.brief.category,
+    'Question: '+state.brief.question,
+    'Type: '+typeLabel+' | Panel: '+state.responses.length+' personas',
+    '',
+    '----------',
+    'KEY METRICS',
+    '----------',
+    'Avg Purchase Intent: '+s.avg_purchase_intent+'/10',
+    'Willingness to Pay: $'+fmtNum(s.wtp_range.low)+' - $'+fmtNum(s.wtp_range.high),
+    'Positive Lean: '+posLean+'%',
+    '',
+    '----------',
+    'EXECUTIVE SUMMARY',
+    '----------',
+    s.executive_summary,
+    '',
+    '----------',
+    'RECOMMENDED ACTIONS',
+    '----------',
+    s.recommended_actions.map((a,i)=>(i+1)+'. '+a).join('
+'),
+    '',
+    '----------',
+    'KEY THEMES',
+    '----------',
+    s.themes.map(t=>'* '+t.name+': '+t.description).join('
+'),
+    '',
+    '----------',
+    'TOP OBJECTIONS',
+    '----------',
+    s.key_objections.map(o=>'* '+o).join('
+'),
+    '',
+    '----------',
+    'NOTE: '+s.limitations,
+    '',
+    'Generated by Prism | AI-simulated research. Directional only.',
+  ];
+  const subject=encodeURIComponent('Prism Research: '+state.brief.category);
+  const body=lines.join('
+').split('
+').map(l=>encodeURIComponent(l)).join(nl);
+  window.location.href='mailto:?subject='+subject+'&body='+body;
 }
 
 function exportPDF(){
@@ -1289,6 +1403,9 @@ function renderSessions(){
   }
 
   clearBtn.style.display='inline-flex';
+  // Update sessions section label with count
+  const secLabel=document.querySelector('.sessions-section .section-label');
+  if(secLabel) secLabel.textContent='Saved Sessions ('+sessions.length+')';
   grid.innerHTML=sessions.map(s=>{
     const date=new Date(s.timestamp).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
     const intent=s.synthesis?.avg_purchase_intent||'—';
@@ -1318,7 +1435,11 @@ async function callClaude(messages,temperature=0.7,maxTokens=1000,systemPrompt=n
   const body={model:'claude-sonnet-4-20250514',max_tokens:maxTokens,temperature,messages};
   if(systemPrompt)body.system=systemPrompt;
   const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  if(!response.ok){const e=await response.text();throw new Error(`API ${response.status}: ${e}`);}
+  if(!response.ok){
+    const data=await response.json().catch(()=>({}));
+    if(response.status===429)throw new Error(data.error||'Rate limit reached. Please wait an hour and try again.');
+    throw new Error(data.error||`API error ${response.status}`);
+  }
   return response.json();
 }
 
