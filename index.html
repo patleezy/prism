@@ -1187,11 +1187,8 @@ function saveSession(){
   };
   const sessions=getSessions();
   sessions.unshift(session);
-  // Keep max 20 sessions
   if(sessions.length>20)sessions.pop();
   saveSessions(sessions);
-
-  const btn=document.getElementById('save-btn');
   btn.className='export-btn saved-btn';
   btn.innerHTML='✓ Saved';
   btn.onclick=null;
