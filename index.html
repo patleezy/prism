@@ -78,11 +78,13 @@
   /* INFO ICON + TOOLTIP */
   .info-icon{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);color:var(--text-faint);font-size:9px;cursor:pointer;font-style:normal;font-weight:600;flex-shrink:0;transition:all .15s;position:relative;font-family:'DM Mono',monospace;z-index:10;}
   .info-icon:hover{border-color:var(--accent2);color:var(--accent2);}
-  .tooltip-box{position:absolute;bottom:calc(100% + 8px);right:0;background:#1e2028;border:1px solid var(--border-light);border-radius:var(--radius);padding:13px 15px;width:240px;font-size:11px;color:var(--text-muted);line-height:1.65;z-index:400;pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s;box-shadow:0 8px 28px rgba(0,0,0,.5);}
-  [data-theme="light"] .tooltip-box{background:#fff;}
-  .tooltip-box.show{opacity:1;transform:translateY(0);}
-  .tooltip-title{font-weight:600;color:var(--text);margin-bottom:5px;font-size:11px;}
-  .tooltip-ex{margin-top:7px;padding-top:7px;border-top:1px solid var(--border);color:var(--text-faint);font-style:italic;}
+  .tooltip-box{position:fixed;background:#1e2028;border:1px solid var(--border-light);border-radius:var(--radius);padding:14px 16px;width:260px;font-size:12px;color:var(--text-muted);line-height:1.7;z-index:9999;pointer-events:auto;opacity:0;transition:opacity .2s;box-shadow:0 12px 40px rgba(0,0,0,.6);display:none;text-transform:none;letter-spacing:0;font-family:'DM Sans',sans-serif;}
+  [data-theme="light"] .tooltip-box{background:#fff;box-shadow:0 12px 40px rgba(0,0,0,.15);}
+  .tooltip-box.show{opacity:1;display:block;}
+  .tooltip-title{font-weight:600;color:var(--text);margin-bottom:6px;font-size:12px;}
+  .tooltip-ex{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);color:var(--text-faint);font-style:italic;font-size:11px;}
+  .tooltip-close{float:right;background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:16px;line-height:1;padding:0 0 0 8px;margin-top:-2px;}
+  .tooltip-close:hover{color:var(--text);}
 
   /* CHIPS */
   .chips-wrap{margin-bottom:9px;}
@@ -142,7 +144,7 @@
   .persona-meta{font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-bottom:7px;}
   .persona-archetype{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;background:var(--bg3);color:var(--text-muted);border:1px solid var(--border);margin-bottom:6px;}
   .persona-stance{font-size:11px;color:var(--text-muted);line-height:1.5;font-style:italic;}
-  .persona-regen{position:absolute;top:11px;right:11px;background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:14px;padding:3px;border-radius:4px;transition:color .15s;line-height:1;}
+  .persona-regen{position:absolute;top:11px;right:11px;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text-muted);cursor:pointer;font-size:13px;padding:4px 6px;border-radius:6px;transition:all .15s;line-height:1;}
   .persona-regen:hover{color:var(--text-muted);}
 
   /* RUNNING */
@@ -235,7 +237,7 @@
   /* WTP TOOLTIP */
   .wtp-info{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);color:var(--text-faint);font-size:8px;cursor:pointer;font-style:normal;font-weight:700;flex-shrink:0;position:relative;font-family:'DM Mono',monospace;vertical-align:middle;margin-left:4px;}
   .wtp-info:hover{border-color:var(--accent2);color:var(--accent2);}
-  .wtp-tip{position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%) translateY(3px);background:#1e2028;border:1px solid var(--border-light);border-radius:var(--radius);padding:10px 13px;width:220px;font-size:11px;color:var(--text-muted);line-height:1.6;z-index:500;pointer-events:none;opacity:0;transition:opacity .15s,transform .15s;box-shadow:0 8px 28px rgba(0,0,0,.5);}
+  .wtp-tip{position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%) translateY(3px);background:#1e2028;border:1px solid var(--border-light);border-radius:var(--radius);padding:10px 13px;width:220px;font-size:11px;color:var(--text-muted);line-height:1.6;z-index:500;pointer-events:none;opacity:0;transition:opacity .15s,transform .15s;box-shadow:0 8px 28px rgba(0,0,0,.5);text-transform:none;letter-spacing:0;font-family:'DM Sans',sans-serif;}
   [data-theme="light"] .wtp-tip{background:#fff;}
   .wtp-info:hover .wtp-tip,.wtp-tip.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
@@ -552,20 +554,43 @@
     <input type="text" id="i-cat" placeholder="e.g. Premium wireless headphones, Local ice cream shop, Luxury car subscription…" maxlength="120">
   </div>
 
+  <!-- Tooltip containers — rendered outside cards so they're not clipped -->
+  <div id="tip-concept" class="tooltip-box">
+    <button class="tooltip-close" onclick="closeTip('tip-concept')">×</button>
+    <div class="tooltip-title">Concept Testing</div>
+    Best for evaluating new product ideas, features, or services before investing in development.
+    <div class="tooltip-ex">e.g. "We're launching a $49/mo subscription that replaces your gym. Would you switch?"</div>
+  </div>
+  <div id="tip-price" class="tooltip-box">
+    <button class="tooltip-close" onclick="closeTip('tip-price')">×</button>
+    <div class="tooltip-title">Price Sensitivity</div>
+    Uses Van Westendorp methodology — each persona evaluates your price across four thresholds to find an acceptable range.
+    <div class="tooltip-ex">e.g. "At what price does this feel too cheap, fair, expensive, or way too expensive?"</div>
+  </div>
+  <div id="tip-message" class="tooltip-box">
+    <button class="tooltip-close" onclick="closeTip('tip-message')">×</button>
+    <div class="tooltip-title">Message Testing</div>
+    Test ad copy, taglines, or positioning. Each persona rates on clarity, relevance, and motivation to act.
+    <div class="tooltip-ex">e.g. "Which tagline lands better: 'Sound that disappears' or 'The last headphone you'll ever need'?"</div>
+  </div>
+  <div id="tip-open" class="tooltip-box">
+    <button class="tooltip-close" onclick="closeTip('tip-open')">×</button>
+    <div class="tooltip-title">Open Research</div>
+    Free-form exploration, AI-moderated. Best for discovery or questions that don't fit the other types.
+    <div class="tooltip-ex">e.g. "Walk me through how you decide to buy a new pair of headphones."</div>
+  </div>
+
   <div class="form-group">
-    <label class="field-lbl">Research Type</label>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+      <label class="field-lbl" style="margin-bottom:0">Research Type</label>
+      <span style="font-size:11px;color:var(--text-faint)">— tap <i class="info-icon" style="display:inline-flex;cursor:default;pointer-events:none">i</i> on any type to learn more</span>
+    </div>
     <div class="type-grid">
       <label class="type-card selected" id="tc-concept" onclick="selectType('concept')">
         <input type="radio" name="rt" value="concept" checked>
         <div class="type-card-header">
           <div class="type-card-name">Concept Testing</div>
-          <i class="info-icon" onmousedown="toggleTip(event,'tip-concept')">i
-            <div class="tooltip-box" id="tip-concept">
-              <div class="tooltip-title">Concept Testing</div>
-              Best for evaluating new product ideas, features, or services before investing in development.
-              <div class="tooltip-ex">e.g. "We're launching a $49/mo subscription that replaces your gym membership. Would you switch?"</div>
-            </div>
-          </i>
+          <i class="info-icon" onclick="showTip(event,'tip-concept')">i</i>
         </div>
         <div class="type-card-desc">Evaluate product or feature ideas</div>
       </label>
@@ -573,13 +598,7 @@
         <input type="radio" name="rt" value="price">
         <div class="type-card-header">
           <div class="type-card-name">Price Sensitivity</div>
-          <i class="info-icon" onmousedown="toggleTip(event,'tip-price')">i
-            <div class="tooltip-box" id="tip-price">
-              <div class="tooltip-title">Price Sensitivity</div>
-              Uses Van Westendorp methodology — each persona evaluates your price across four thresholds to find an acceptable range.
-              <div class="tooltip-ex">e.g. "A scoop of ice cream is $7. At what price does this seem too cheap, fair, expensive, or way too expensive?"</div>
-            </div>
-          </i>
+          <i class="info-icon" onclick="showTip(event,'tip-price')">i</i>
         </div>
         <div class="type-card-desc">Find your acceptable price range</div>
       </label>
@@ -587,13 +606,7 @@
         <input type="radio" name="rt" value="message">
         <div class="type-card-header">
           <div class="type-card-name">Message Testing</div>
-          <i class="info-icon" onmousedown="toggleTip(event,'tip-message')">i
-            <div class="tooltip-box" id="tip-message">
-              <div class="tooltip-title">Message Testing</div>
-              Test ad copy, taglines, or positioning. Each persona rates on clarity, relevance, and motivation to act.
-              <div class="tooltip-ex">e.g. "Which tagline lands better: 'Sound that disappears into your world' or 'The last headphone you'll ever need'?"</div>
-            </div>
-          </i>
+          <i class="info-icon" onclick="showTip(event,'tip-message')">i</i>
         </div>
         <div class="type-card-desc">Test copy, taglines, positioning</div>
       </label>
@@ -601,13 +614,7 @@
         <input type="radio" name="rt" value="open">
         <div class="type-card-header">
           <div class="type-card-name">Open Research</div>
-          <i class="info-icon" onmousedown="toggleTip(event,'tip-open')">i
-            <div class="tooltip-box" id="tip-open">
-              <div class="tooltip-title">Open Research</div>
-              Free-form exploration, AI-moderated. Best for discovery, category understanding, or questions that don't fit the other types.
-              <div class="tooltip-ex">e.g. "Walk me through how you decide to buy a new pair of headphones. What triggers the decision?"</div>
-            </div>
-          </i>
+          <i class="info-icon" onclick="showTip(event,'tip-open')">i</i>
         </div>
         <div class="type-card-desc">Free-form, AI-moderated</div>
       </label>
@@ -735,15 +742,32 @@ function fmtNum(n){
   return parseFloat(num.toFixed(2)).toString();
 }
 
-// Emoji assignment — neutral set, no gendered assumptions
-const NEUTRAL_EMOJIS=['🧑','🧑‍💼','🧑‍🎓','🧑‍🔬','🧑‍🎨','🧑‍🍳','🧑‍💻','🧑‍🏫','🧑‍⚕️','🧑‍🌾','🧑‍🔧','🧑‍✈️'];
+// Emoji assignment — occupation-based, fully neutral
+const OCCUPATION_EMOJIS = {
+  engineer: '🧑‍💻', software: '🧑‍💻', developer: '🧑‍💻', tech: '🧑‍💻',
+  teacher: '🧑‍🏫', professor: '🧑‍🏫', educator: '🧑‍🏫', instructor: '🧑‍🏫',
+  doctor: '🧑‍⚕️', nurse: '🧑‍⚕️', medical: '🧑‍⚕️', health: '🧑‍⚕️', therapist: '🧑‍⚕️',
+  chef: '🧑‍🍳', cook: '🧑‍🍳', baker: '🧑‍🍳',
+  artist: '🧑‍🎨', designer: '🧑‍🎨', creative: '🧑‍🎨',
+  scientist: '🧑‍🔬', researcher: '🧑‍🔬', analyst: '🧑‍🔬',
+  farmer: '🧑‍🌾', gardener: '🧑‍🌾',
+  mechanic: '🧑‍🔧', technician: '🧑‍🔧',
+  pilot: '🧑‍✈️', flight: '🧑‍✈️',
+  manager: '🧑‍💼', executive: '🧑‍💼', director: '🧑‍💼', ceo: '🧑‍💼', consultant: '🧑‍💼',
+  coach: '🧑‍💼', trainer: '🧑‍💼', fitness: '🧑‍💼',
+  student: '🧑‍🎓', graduate: '🧑‍🎓',
+  retired: '🧓', senior: '🧓',
+};
+const FALLBACK_EMOJIS = ['🧑','🧑‍💼','🧑‍🎓','🧑‍🔬','🧑‍🎨','🧑‍🍳','🧑‍💻','🧑‍🏫','🧑‍⚕️','🧓','🧑‍🌾','🧑‍✈️'];
 
 function getPersonaEmoji(persona, index) {
-  // Use age to pick appropriate emoji style
+  const occ = (persona.occupation || '').toLowerCase();
+  for (const [keyword, emoji] of Object.entries(OCCUPATION_EMOJIS)) {
+    if (occ.includes(keyword)) return emoji;
+  }
   const age = persona.age || 30;
-  if (age >= 60) return index % 2 === 0 ? '👴' : '👵';
-  if (age >= 45) return NEUTRAL_EMOJIS[(index + 3) % NEUTRAL_EMOJIS.length];
-  return NEUTRAL_EMOJIS[index % NEUTRAL_EMOJIS.length];
+  if (age >= 60) return '🧓';
+  return FALLBACK_EMOJIS[index % FALLBACK_EMOJIS.length];
 }
 
 const CHIPS={
@@ -843,17 +867,32 @@ function selectType(t){
 }
 
 // ── TOOLTIPS ──
-function toggleTip(e,id){
+function showTip(e, id) {
   e.preventDefault();
   e.stopPropagation();
   e.stopImmediatePropagation();
-  const tip=document.getElementById(id);
-  const showing=tip.classList.contains('show');
-  document.querySelectorAll('.tooltip-box.show').forEach(t=>t.classList.remove('show'));
-  if(!showing)tip.classList.add('show');
+  const tip = document.getElementById(id);
+  const already = tip.classList.contains('show');
+  // Close all
+  document.querySelectorAll('.tooltip-box.show').forEach(t => t.classList.remove('show'));
+  if (already) return;
+  // Position near the icon
+  const rect = e.target.getBoundingClientRect();
+  tip.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+  // Keep within viewport
+  const left = Math.min(rect.left + window.scrollX - 10, window.innerWidth - 280);
+  tip.style.left = Math.max(10, left) + 'px';
+  tip.classList.add('show');
   return false;
 }
-document.addEventListener('click',()=>document.querySelectorAll('.tooltip-box.show').forEach(t=>t.classList.remove('show')));
+function closeTip(id) {
+  document.getElementById(id).classList.remove('show');
+}
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.tooltip-box') && !e.target.closest('.info-icon')) {
+    document.querySelectorAll('.tooltip-box.show').forEach(t => t.classList.remove('show'));
+  }
+});
 
 // ── BRIEF ──
 async function submitBrief(){
