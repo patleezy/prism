@@ -3,7 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prism — Synthetic Focus Groups</title>
+<title>Prism — AI Focus Groups on Demand</title>
+
+<!-- SEO -->
+<meta name="description" content="Prism simulates a full consumer focus group using AI personas. Get directional research insights in minutes — concept testing, price sensitivity, message testing, and more.">
+<meta name="keywords" content="AI focus group, synthetic research, consumer insights, persona simulation, market research, concept testing, price sensitivity">
+<meta name="author" content="Prism">
+<link rel="canonical" href="https://heyprism.app">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://heyprism.app">
+<meta property="og:title" content="Prism — AI Focus Groups on Demand">
+<meta property="og:description" content="Simulate a full consumer focus group using AI personas. Directional research insights in minutes, not weeks.">
+<meta property="og:image" content="https://heyprism.app/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Prism">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://heyprism.app">
+<meta name="twitter:title" content="Prism — AI Focus Groups on Demand">
+<meta name="twitter:description" content="Simulate a full consumer focus group using AI personas. Directional research insights in minutes, not weeks.">
+<meta name="twitter:image" content="https://heyprism.app/og.png">
+
+<!-- Favicon — inline SVG prism mark -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230a0a0b'/><polygon points='16,4 28,26 4,26' stroke='%23c8b560' stroke-width='2' fill='none'/><line x1='16' y1='4' x2='16' y2='26' stroke='%236ab0d4' stroke-width='1.2' opacity='.7'/><line x1='16' y1='4' x2='9' y2='26' stroke='%23a06ac8' stroke-width='1.2' opacity='.6'/><line x1='16' y1='4' x2='23' y2='26' stroke='%23c46060' stroke-width='1.2' opacity='.6'/></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230a0a0b'/><polygon points='16,4 28,26 4,26' stroke='%23c8b560' stroke-width='2' fill='none'/></svg>">
+<meta name="theme-color" content="#0a0a0b">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -253,6 +282,18 @@
   .export-btn.save-btn{border-color:var(--accent);color:var(--accent);background:rgba(200,181,96,.06);}
   .export-btn.save-btn:hover{background:rgba(200,181,96,.12);}
   .export-btn.saved-btn{border-color:var(--success);color:var(--success);background:rgba(90,158,110,.06);}
+
+  /* PANEL TEMPLATES */
+  .templates-section{margin-bottom:28px;}
+  .templates-label{font-size:11px;font-family:'DM Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-faint);margin-bottom:12px;}
+  .templates-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:10px;}
+  .template-card{border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;cursor:pointer;background:var(--bg2);transition:all .15s;position:relative;}
+  .template-card:hover{border-color:var(--border-light);background:var(--bg3);}
+  .template-card.selected{border-color:var(--accent2);background:rgba(106,176,212,.06);}
+  .template-card-icon{font-size:18px;margin-bottom:6px;}
+  .template-card-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px;}
+  .template-card-desc{font-size:10px;color:var(--text-muted);line-height:1.4;}
+  .template-auto{border-style:dashed;}
 
   /* SAVED SESSIONS */
   .sessions-section{margin-top:44px;}
@@ -710,7 +751,14 @@
 <div class="screen" id="screen-panel">
   <div class="section-label">Step 02</div>
   <h2 class="display-heading">Your <em>Panel</em></h2>
-  <p class="subtitle" id="panel-sub">Review your focus group panel before running the simulation.</p>
+  <p class="subtitle" id="panel-sub">Choose a panel template or use the auto-generated panel below.</p>
+
+  <div class="templates-section">
+    <div class="templates-label">Panel Templates</div>
+    <div class="templates-grid" id="templates-grid"></div>
+    <div style="font-size:11px;color:var(--text-faint);margin-top:4px">Selecting a template replaces the current panel</div>
+  </div>
+
   <div class="panel-grid" id="panel-grid"></div>
   <div id="panel-err" class="error-box" style="display:none"></div>
   <div class="btn-row">
@@ -866,6 +914,49 @@ const CHIPS={
     {i:'🔄',t:'What would make you switch from your current solution?'},
   ]
 };
+
+const PANEL_TEMPLATES = [
+  {
+    id:'auto', icon:'✦', name:'Auto-generate', desc:'AI builds a diverse panel from your brief',
+    archetypes:null // null = use auto-generation
+  },
+  {
+    id:'genz', icon:'📱', name:'Gen Z Consumers', desc:'Ages 18–26, digital-native, value-driven',
+    archetypes:['Status Seeker','Social Validator','Budget Stretcher','Lifestyle Aligner','Skeptic','Practical Optimizer'],
+    ageRange:[18,26], incomes:['$20k-$35k','$35k-$50k','$50k-$75k'],
+    locations:['urban','urban','suburban']
+  },
+  {
+    id:'b2b', icon:'💼', name:'B2B Decision Makers', desc:'Managers & execs evaluating business tools',
+    archetypes:['Practical Optimizer','Skeptic','Power User','Value Maximizer','Reluctant Upgrader','Loyalist'],
+    ageRange:[30,52], incomes:['$90k-$120k','$120k-$150k','$150k+'],
+    locations:['urban','suburban','urban']
+  },
+  {
+    id:'parents', icon:'👨‍👩‍👧', name:'Budget-Conscious Parents', desc:'Ages 28–42, suburban, value & safety focused',
+    archetypes:['Value Maximizer','Budget Stretcher','Practical Optimizer','Reluctant Upgrader','Lifestyle Aligner','Skeptic'],
+    ageRange:[28,42], incomes:['$50k-$75k','$75k-$100k','$40k-$60k'],
+    locations:['suburban','suburban','rural']
+  },
+  {
+    id:'early', icon:'🚀', name:'Early Adopters', desc:'Tech-forward, high income, trend-seeking',
+    archetypes:['Power User','Status Seeker','Social Validator','Lifestyle Aligner','Practical Optimizer','Value Maximizer'],
+    ageRange:[24,38], incomes:['$90k-$120k','$120k-$150k','$75k-$100k'],
+    locations:['urban','urban','suburban']
+  },
+  {
+    id:'luxury', icon:'✨', name:'Luxury Buyers', desc:'High income, brand-motivated, premium segment',
+    archetypes:['Status Seeker','Loyalist','Power User','Lifestyle Aligner','Social Validator','Value Maximizer'],
+    ageRange:[32,55], incomes:['$150k+','$120k-$150k','$150k+'],
+    locations:['urban','urban','suburban']
+  },
+  {
+    id:'mainstream', icon:'🏘️', name:'Skeptical Mainstream', desc:'Middle America, price-sensitive, brand-skeptical',
+    archetypes:['Skeptic','Value Maximizer','Reluctant Upgrader','Budget Stretcher','Practical Optimizer','Loyalist'],
+    ageRange:[30,58], incomes:['$40k-$60k','$50k-$75k','$60k-$80k'],
+    locations:['suburban','rural','suburban']
+  },
+];
 
 const RT_GUIDE={
   price:'Apply Van Westendorp: at what price does this feel too cheap (quality concern), acceptable, expensive but worth it, and too expensive to consider?',
@@ -1024,6 +1115,7 @@ async function submitBrief(){
   try{
     await genPanel();
     setScreen('panel');updateNav(2);
+    renderTemplates('auto');
   }catch(e){
     err.textContent='Error: '+e.message;err.style.display='block';
   }finally{btn.disabled=false;btn.innerHTML='Build Panel →';}
@@ -1069,6 +1161,56 @@ function safeParseJSON(raw){
   const o1=s.indexOf('{'),o2=s.lastIndexOf('}');
   if(o1!==-1&&o2>o1){try{return JSON.parse(s.slice(o1,o2+1));}catch(e){}}
   throw new Error('Could not parse response. Raw: '+s.slice(0,200));
+}
+
+function renderTemplates(selectedId){
+  const grid=document.getElementById('templates-grid');
+  if(!grid)return;
+  grid.innerHTML=PANEL_TEMPLATES.map(t=>`
+    <div class="template-card${t.id==='auto'?' template-auto':''} ${selectedId===t.id?'selected':''}"
+         onclick="applyTemplate('${t.id}')">
+      <div class="template-card-icon">${t.icon}</div>
+      <div class="template-card-name">${t.name}</div>
+      <div class="template-card-desc">${t.desc}</div>
+    </div>`).join('');
+}
+
+async function applyTemplate(id){
+  const tpl=PANEL_TEMPLATES.find(t=>t.id===id);
+  if(!tpl)return;
+  renderTemplates(id);
+  if(id==='auto'||!tpl.archetypes){
+    // Re-generate auto panel
+    const b=document.getElementById('regen-btn');
+    b.disabled=true;b.innerHTML='<span class="spinner"></span> Generating…';
+    try{await genPanel();}catch(e){showError(document.getElementById('panel-err'),e.message);}
+    finally{b.disabled=false;b.innerHTML='↺ Regenerate';}
+    return;
+  }
+  // Build panel from template
+  const size=state.brief.panelSize||8;
+  const archetypes=[...tpl.archetypes];
+  // Pad if panel size > template archetypes
+  while(archetypes.length<size)archetypes.push(tpl.archetypes[archetypes.length%tpl.archetypes.length]);
+  const prompt=`Generate exactly ${Math.min(size,tpl.archetypes.length)} focus group personas as a JSON array.
+Category: ${state.brief.category}
+Research Question: ${state.brief.question}
+Panel Template: ${tpl.name} — ${tpl.desc}
+
+IMPORTANT constraints:
+- Ages must be between ${tpl.ageRange[0]} and ${tpl.ageRange[1]}
+- Use these archetypes in order: ${archetypes.slice(0,size).join(', ')}
+- Income bands from: ${tpl.incomes.join(', ')}
+- Location mix: ${tpl.locations.join(', ')}
+
+Each JSON object needs: id, name, age, income_band, location_type, occupation, values (array of 3), category_relationship, likely_stance, archetype.
+Return ONLY the JSON array. No markdown.`;
+  const sys=`You are a JSON API. Output ONLY raw JSON. Start with [.`;
+  try{
+    const data=await callClaude([{role:'user',content:prompt}],0.8,2000,sys);
+    state.panel=safeParseJSON(data.content[0].text);
+    renderPanel();
+  }catch(e){showError(document.getElementById('panel-err'),e.message);}
 }
 
 function renderPanel(){
@@ -1143,6 +1285,7 @@ Respond with exactly: {"warmup":"2-3 sentences","core":"3-5 sentences thinking o
       state.responses.push(r);
       if(c){c.classList.remove('running');c.classList.add('done');}
       if(s){s.className='sim-status done';s.innerHTML='<div class="dot"></div> Done';}
+      saveProgress(); // Auto-save after each persona
     }catch(e){
       console.error('Sim error',p.name,e);
       state.responses.push({personaName:p.name,archetype:p.archetype,personaId:p.id,warmup:'Error.',core:'Error.',followup:'Error.',purchase_intent:5,wtp_low:0,wtp_high:0,top_objection:'Unavailable'});
@@ -1161,6 +1304,7 @@ Respond with exactly: {"warmup":"2-3 sentences","core":"3-5 sentences thinking o
   try{
     await synthesize();
     document.getElementById('prog').style.width='100%';
+    clearProgress(); // Session complete — clear in-progress save
     setTimeout(()=>{renderResults();setScreen('results');updateNav(4);},400);
   }catch(e){
     document.getElementById('synth-status').innerHTML=`<span style="color:var(--accent3)">Synthesis error: ${e.message}</span>`;
@@ -1358,6 +1502,20 @@ function saveSessions(sessions){
   localStorage.setItem(STORAGE_KEY,JSON.stringify(sessions));
 }
 
+function renameSession(e, id, currentTitle){
+  e.stopPropagation();
+  const newTitle=prompt('Rename session:',currentTitle);
+  if(!newTitle||!newTitle.trim())return;
+  const sessions=getSessions();
+  const s=sessions.find(s=>s.id===id);
+  if(s){s.title=newTitle.trim();saveSessions(sessions);renderSessions();}
+}
+
+function generateSessionTitle(brief){
+  const typeLabel={concept:'Concept',price:'Pricing',message:'Messaging',open:'Research'}[brief.researchType]||'Research';
+  return brief.category+' — '+typeLabel;
+}
+
 function saveSession(){
   const btn=document.getElementById('save-btn');
   if(btn.disabled)return;
@@ -1366,6 +1524,7 @@ function saveSession(){
   const session={
     id:'s_'+Date.now(),
     timestamp:Date.now(),
+    title:generateSessionTitle(state.brief),
     brief:{...state.brief},
     responses:[...state.responses],
     synthesis:{...state.synthesis}
@@ -1433,7 +1592,7 @@ function renderSessions(){
     return `
       <div class="session-card" onclick="loadSession('${s.id}')">
         <button class="session-delete" onclick="deleteSession('${s.id}',event)" title="Delete">×</button>
-        <div class="session-card-category">${s.brief.category}</div>
+        <div class="session-card-category" onclick="renameSession(event,'${s.id}',this.dataset.title)" data-title="${s.title||s.brief.category}" title="Tap to rename">${s.title||s.brief.category} <span style="font-size:10px;color:var(--text-faint)">✎</span></div>
         <div class="session-card-q">${s.brief.question}</div>
         <div class="session-card-meta">
           <span class="session-card-date">${date}</span>
@@ -1465,8 +1624,84 @@ async function callClaude(messages,temperature=0.7,maxTokens=1000,systemPrompt=n
 
 function showError(el,msg){el.textContent=msg;el.style.display='block';}
 
+// ── PROGRESS PERSISTENCE ──
+const PROGRESS_KEY='prism_in_progress';
+
+function saveProgress(){
+  try{
+    localStorage.setItem(PROGRESS_KEY,JSON.stringify({
+      brief:state.brief,
+      panel:state.panel,
+      responses:state.responses,
+      timestamp:Date.now()
+    }));
+  }catch(e){}
+}
+
+function clearProgress(){
+  localStorage.removeItem(PROGRESS_KEY);
+}
+
+function checkInProgressSession(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(PROGRESS_KEY)||'null');
+    if(!saved)return;
+    const ageMin=Math.round((Date.now()-saved.timestamp)/60000);
+    if(ageMin>120){clearProgress();return;} // Expire after 2 hours
+    if(!saved.responses||saved.responses.length===0){clearProgress();return;}
+    // Show resume banner
+    const banner=document.createElement('div');
+    banner.id='resume-banner';
+    banner.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--card-bg);border:1px solid var(--accent);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:14px;z-index:500;box-shadow:0 8px 32px rgba(0,0,0,.4);max-width:420px;width:90%';
+    banner.innerHTML=\`<div style="flex:1"><div style="font-size:13px;font-weight:500;color:var(--text)">Incomplete session found</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">\${saved.brief.category} · \${saved.responses.length} of \${saved.panel.length} responses saved · \${ageMin}m ago</div></div><button onclick="resumeSession()" style="background:var(--accent);color:#0a0a0b;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">Resume</button><button onclick="document.getElementById('resume-banner').remove();clearProgress();" style="background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:18px;padding:0 0 0 4px">×</button>\`;
+    document.body.appendChild(banner);
+  }catch(e){}
+}
+
+function resumeSession(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(PROGRESS_KEY)||'null');
+    if(!saved)return;
+    state.brief=saved.brief;
+    state.panel=saved.panel;
+    state.responses=saved.responses;
+    document.getElementById('resume-banner')?.remove();
+    // Go to results if we have synthesis, else re-run synthesis
+    if(saved.responses.length===saved.panel.length){
+      // All personas done, just need synthesis
+      setScreen('running');
+      document.getElementById('stepsBar').style.display='flex';
+      updateNav(3);
+      document.getElementById('tot-c').textContent=state.panel.length;
+      document.getElementById('done-c').textContent=state.responses.length;
+      document.getElementById('prog').style.width='85%';
+      document.getElementById('synth-status').style.display='block';
+      const grid=document.getElementById('run-grid');
+      grid.innerHTML='';
+      state.panel.forEach((p,i)=>{
+        const c=document.createElement('div');c.className='sim-card done';
+        c.innerHTML=\`<div><div class="sim-name">\${p.name}</div><div class="sim-meta">\${p.archetype}</div></div><div class="sim-status done"><div class="dot"></div> Restored</div>\`;
+        grid.appendChild(c);
+      });
+      synthesize().then(()=>{
+        clearProgress();
+        renderResults();
+        setScreen('results');
+        updateNav(4);
+      }).catch(e=>console.error('Synthesis error',e));
+    } else {
+      // Partial — go to panel step to re-run
+      renderPanel();
+      setScreen('panel');
+      document.getElementById('stepsBar').style.display='flex';
+      updateNav(2);
+    }
+  }catch(e){console.error('Resume error',e);}
+}
+
 // ── INIT ──
 renderSessions();
+checkInProgressSession();
 </script>
 </body>
 </html>
