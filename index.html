@@ -559,7 +559,7 @@
         <input type="radio" name="rt" value="concept" checked>
         <div class="type-card-header">
           <div class="type-card-name">Concept Testing</div>
-          <i class="info-icon" onclick="toggleTip(event,'tip-concept')">i
+          <i class="info-icon" onmousedown="toggleTip(event,'tip-concept')">i
             <div class="tooltip-box" id="tip-concept">
               <div class="tooltip-title">Concept Testing</div>
               Best for evaluating new product ideas, features, or services before investing in development.
@@ -573,7 +573,7 @@
         <input type="radio" name="rt" value="price">
         <div class="type-card-header">
           <div class="type-card-name">Price Sensitivity</div>
-          <i class="info-icon" onclick="toggleTip(event,'tip-price')">i
+          <i class="info-icon" onmousedown="toggleTip(event,'tip-price')">i
             <div class="tooltip-box" id="tip-price">
               <div class="tooltip-title">Price Sensitivity</div>
               Uses Van Westendorp methodology — each persona evaluates your price across four thresholds to find an acceptable range.
@@ -587,7 +587,7 @@
         <input type="radio" name="rt" value="message">
         <div class="type-card-header">
           <div class="type-card-name">Message Testing</div>
-          <i class="info-icon" onclick="toggleTip(event,'tip-message')">i
+          <i class="info-icon" onmousedown="toggleTip(event,'tip-message')">i
             <div class="tooltip-box" id="tip-message">
               <div class="tooltip-title">Message Testing</div>
               Test ad copy, taglines, or positioning. Each persona rates on clarity, relevance, and motivation to act.
@@ -601,7 +601,7 @@
         <input type="radio" name="rt" value="open">
         <div class="type-card-header">
           <div class="type-card-name">Open Research</div>
-          <i class="info-icon" onclick="toggleTip(event,'tip-open')">i
+          <i class="info-icon" onmousedown="toggleTip(event,'tip-open')">i
             <div class="tooltip-box" id="tip-open">
               <div class="tooltip-title">Open Research</div>
               Free-form exploration, AI-moderated. Best for discovery, category understanding, or questions that don't fit the other types.
@@ -735,7 +735,16 @@ function fmtNum(n){
   return parseFloat(num.toFixed(2)).toString();
 }
 
-const EMOJIS=['👩','👨','🧑','👴','👵','🧔','👩‍💼','👨‍💼','🧑‍🎓','👩‍🔬','👨‍🎨','🧑‍🍳'];
+// Emoji assignment — neutral set, no gendered assumptions
+const NEUTRAL_EMOJIS=['🧑','🧑‍💼','🧑‍🎓','🧑‍🔬','🧑‍🎨','🧑‍🍳','🧑‍💻','🧑‍🏫','🧑‍⚕️','🧑‍🌾','🧑‍🔧','🧑‍✈️'];
+
+function getPersonaEmoji(persona, index) {
+  // Use age to pick appropriate emoji style
+  const age = persona.age || 30;
+  if (age >= 60) return index % 2 === 0 ? '👴' : '👵';
+  if (age >= 45) return NEUTRAL_EMOJIS[(index + 3) % NEUTRAL_EMOJIS.length];
+  return NEUTRAL_EMOJIS[index % NEUTRAL_EMOJIS.length];
+}
 
 const CHIPS={
   concept:[
@@ -835,11 +844,14 @@ function selectType(t){
 
 // ── TOOLTIPS ──
 function toggleTip(e,id){
+  e.preventDefault();
   e.stopPropagation();
+  e.stopImmediatePropagation();
   const tip=document.getElementById(id);
   const showing=tip.classList.contains('show');
   document.querySelectorAll('.tooltip-box.show').forEach(t=>t.classList.remove('show'));
   if(!showing)tip.classList.add('show');
+  return false;
 }
 document.addEventListener('click',()=>document.querySelectorAll('.tooltip-box.show').forEach(t=>t.classList.remove('show')));
 
@@ -910,7 +922,7 @@ function renderPanel(){
   state.panel.forEach((p,i)=>{
     const c=document.createElement('div');c.className='persona-card';c.style.animationDelay=(i*.05)+'s';
     c.innerHTML=`<button class="persona-regen" onclick="regenOne(${i})" title="Regenerate">↺</button>
-      <div class="persona-avatar">${EMOJIS[i%EMOJIS.length]}</div>
+      <div class="persona-avatar">${getPersonaEmoji(p,i)}</div>
       <div class="persona-name">${p.name}</div>
       <div class="persona-meta">${p.age} · ${p.income_band} · ${p.location_type}</div>
       <div class="persona-meta" style="margin-bottom:8px">${p.occupation}</div>
@@ -1026,16 +1038,16 @@ function renderResults(){
   const s=state.synthesis,r=state.responses;
   window.scrollTo(0,0);
   const typeLabels={concept:'Concept Test',price:'Price Sensitivity',message:'Message Test',open:'Open Research'};
-  document.getElementById('res-heading').innerHTML=`<em>${state.brief.category}</em> — Insights`;
+  document.getElementById('res-heading').innerHTML=`<span style="font-style:normal;color:var(--accent)">${state.brief.category}</span> <span style="color:var(--text-muted);font-weight:400">—</span> Insights`;
   document.getElementById('res-type-tag').textContent=typeLabels[state.brief.researchType]||state.brief.researchType;
   document.getElementById('exec-text').innerHTML=s.executive_summary.split('\n').filter(p=>p.trim()).map(p=>`<p>${p}</p>`).join('');
   document.getElementById('actions-list').innerHTML=(s.recommended_actions||[]).map((a,i)=>`<div class="action-item"><div class="action-num">0${i+1}</div><div class="action-text">${a}</div></div>`).join('');
 
   const pos=r.filter(x=>(x.purchase_intent||0)>=6).length;
   document.getElementById('dash-grid').innerHTML=`
-    <div class="metric-card"><div class="metric-label">Avg Intent</div><div class="metric-value">${s.avg_purchase_intent}<span style="font-size:16px;color:var(--text-muted)">/10</span></div><div class="metric-sub">${r.length} personas</div></div>
-    <div class="metric-card"><div class="metric-label" style="display:flex;align-items:center;gap:4px">WTP Range <i class="wtp-info" style="margin-left:2px">i<span class="wtp-tip">Willingness to Pay range — the acceptable price window across your panel. Low = floor, High = ceiling before walk-away.</span></i></div><div class="metric-value" style="font-size:22px">$${fmtNum(s.wtp_range.low)}–$${fmtNum(s.wtp_range.high)}</div><div class="metric-sub">Acceptable price window</div></div>
-    <div class="metric-card"><div class="metric-label">Positive Lean</div><div class="metric-value">${Math.round((pos/r.length)*100)}<span style="font-size:16px;color:var(--text-muted)">%</span></div><div class="metric-sub">${pos===r.length?'All personas':'Intent ≥ 6/10'}</div></div>`;
+    <div class="metric-card"><div class="metric-label">Avg Intent</div><div class="metric-value">${s.avg_purchase_intent}<span style="font-size:14px;color:var(--text-muted);font-weight:400;letter-spacing:0">&thinsp;/10</span></div><div class="metric-sub">${r.length} personas</div></div>
+    <div class="metric-card"><div class="metric-label" style="display:flex;align-items:center;gap:4px">WTP Range <i class="wtp-info" style="margin-left:2px">i<span class="wtp-tip">Willingness to Pay — the price range personas indicated they would consider acceptable. Low is the floor price; High is the ceiling before they walk away.</span></i></div><div class="metric-value" style="font-size:22px">$${fmtNum(s.wtp_range.low)}–$${fmtNum(s.wtp_range.high)}</div><div class="metric-sub">Acceptable price window</div></div>
+    <div class="metric-card"><div class="metric-label">Positive Lean</div><div class="metric-value">${Math.round((pos/r.length)*100)}<span style="font-size:18px;color:var(--text-muted);font-weight:400">%</span></div><div class="metric-sub">${pos===r.length?'All personas':'Intent ≥ 6/10'}</div></div>`;
 
   const sorted=[...r].sort((a,b)=>(b.purchase_intent||0)-(a.purchase_intent||0));
   document.getElementById('intent-chart').innerHTML=sorted.map(x=>{
