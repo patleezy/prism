@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="rainbow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#c8b560"/>
+      <stop offset="33%"  stop-color="#6ab0d4"/>
+      <stop offset="66%"  stop-color="#a06ac8"/>
+      <stop offset="100%" stop-color="#c46060"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="44%" r="45%">
+      <stop offset="0%"   stop-color="#c8b560" stop-opacity="0.09"/>
+      <stop offset="40%"  stop-color="#6ab0d4" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#0a0a0b" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#0a0a0b"/>
+
+  <!-- Radial glow -->
+  <rect width="1200" height="630" fill="url(#glow)"/>
+
+  <!-- Rainbow strip -->
+  <rect x="500" y="215" width="200" height="3" rx="1.5" fill="url(#rainbow)"/>
+
+  <!-- Prism triangle logo -->
+  <polygon points="600,258 528,378 672,378"
+    fill="none" stroke="#c8b560" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- Light dispersion lines through the prism -->
+  <line x1="600" y1="258" x2="600" y2="378" stroke="#6ab0d4" stroke-width="1.5" opacity="0.75"/>
+  <line x1="600" y1="258" x2="554" y2="378" stroke="#a06ac8" stroke-width="1.5" opacity="0.65"/>
+  <line x1="600" y1="258" x2="646" y2="378" stroke="#c46060" stroke-width="1.5" opacity="0.65"/>
+
+  <!-- "Prism" wordmark -->
+  <text x="600" y="468"
+    text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="86"
+    font-weight="700"
+    fill="#f5f4ef"
+    letter-spacing="-1">Prism</text>
+
+  <!-- "AI FOCUS GROUPS" tagline -->
+  <text x="600" y="516"
+    text-anchor="middle"
+    font-family="'DM Mono', 'Courier New', monospace"
+    font-size="18"
+    fill="#6a6a7a"
+    letter-spacing="5">AI FOCUS GROUPS</text>
+
+  <!-- URL -->
+  <text x="600" y="576"
+    text-anchor="middle"
+    font-family="'DM Mono', 'Courier New', monospace"
+    font-size="13"
+    fill="#3a3a4a"
+    letter-spacing="2">heyprism.app</text>
+</svg>
