@@ -458,6 +458,13 @@
   [data-theme="light"] .btn-primary,[data-theme="light"] .hero-btn{color:#fff;}
   [data-theme="light"] .btn-primary:hover,[data-theme="light"] .hero-btn:hover{background:#5e4b0c;}
 
+  /* ── WHAT PRISM CAN DO ── */
+  .can-do{padding:0 0 56px;text-align:center;}
+  .can-do-label{font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint);margin-bottom:20px;}
+  .can-do-list{list-style:none;display:flex;flex-direction:column;gap:11px;max-width:400px;margin:0 auto;}
+  .can-do-item{font-size:14px;color:var(--text-muted);display:flex;align-items:baseline;gap:10px;justify-content:center;}
+  .can-do-item::before{content:'—';color:var(--accent);font-family:'DM Mono',monospace;flex-shrink:0;}
+
   /* ── CASE STUDIES CAROUSEL ── */
   .use-cases{padding:0 0 48px;text-align:center;}
   .use-cases-label{font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint);margin-bottom:20px;}
@@ -613,6 +620,18 @@
     </div>
   </div>
 
+  <!-- WHAT PRISM CAN DO -->
+  <div class="can-do">
+    <div class="can-do-label">What Prism can do</div>
+    <ul class="can-do-list">
+      <li class="can-do-item">Validate a price point before you launch</li>
+      <li class="can-do-item">Test messaging against a specific audience</li>
+      <li class="can-do-item">Pressure-test a concept before pitching</li>
+      <li class="can-do-item">Understand objections before a product ships</li>
+      <li class="can-do-item">Gut-check a personal or career decision</li>
+    </ul>
+  </div>
+
   <!-- CASE STUDIES CAROUSEL -->
   <div class="use-cases" id="use-cases">
     <div class="use-cases-label">How teams use Prism</div>
@@ -684,7 +703,11 @@
   </div>
 
   <div class="form-group">
-    <label class="field-lbl">Product or Service Category</label>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:7px">
+      <label class="field-lbl" style="margin-bottom:0">Product or Service Category</label>
+      <i class="info-icon" onclick="toggleCatHint(this)" aria-label="What to enter here">i</i>
+    </div>
+    <div id="cat-hint" style="display:none;font-size:12px;color:var(--text-muted);margin-bottom:8px;line-height:1.6;">A brand, product, category, or any subject you want to test — e.g. "Nike Air Max", "a $12 cold brew", "remote work software for HR teams".</div>
     <input type="text" id="i-cat" placeholder="e.g. Premium wireless headphones, a local ice cream shop, video games, luxury skincare…" maxlength="120">
   </div>
 
@@ -1093,6 +1116,11 @@ function selectType(t){
 }
 
 // ── TOOLTIPS ──
+function toggleCatHint(el) {
+  const h = document.getElementById('cat-hint');
+  h.style.display = h.style.display === 'none' ? 'block' : 'none';
+}
+
 function showTip(e, id) {
   e.preventDefault();
   e.stopPropagation();
