@@ -317,7 +317,6 @@
     text-align:center;
     padding:80px 0 60px;
     position:relative;
-    overflow:hidden;
   }
   /* Radial spotlight behind content */
   .hero::before{
@@ -456,6 +455,24 @@
   [data-theme="light"] .hero::before{background:radial-gradient(ellipse at 50% 30%,rgba(120,95,16,.06) 0%,rgba(42,127,168,.04) 40%,transparent 70%);}
   [data-theme="light"] .hero-pill{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.08);}
 
+  /* ── CASE STUDIES CAROUSEL ── */
+  .use-cases{padding:0 0 48px;text-align:center;}
+  .use-cases-label{font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint);margin-bottom:20px;}
+  .carousel-wrap{position:relative;max-width:540px;margin:0 auto;}
+  .carousel-card{background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:26px 28px;text-align:left;min-height:140px;transition:opacity .32s ease,transform .32s ease;}
+  .carousel-card.fade-out{opacity:0;transform:translateY(8px);}
+  .carousel-tag{display:inline-block;font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);background:rgba(200,181,96,.1);border:1px solid rgba(200,181,96,.18);border-radius:4px;padding:3px 8px;margin-bottom:11px;}
+  .carousel-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px;line-height:1.35;}
+  .carousel-insight{font-size:12px;color:var(--text-muted);line-height:1.55;margin-bottom:13px;}
+  .carousel-metric{font-size:11px;font-family:'DM Mono',monospace;color:var(--accent2);}
+  .carousel-controls{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:14px;}
+  .carousel-btn{background:none;border:1px solid var(--border);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-muted);font-size:13px;transition:border-color .15s,color .15s;line-height:1;}
+  .carousel-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .carousel-dots{display:flex;gap:6px;align-items:center;}
+  .carousel-dot{width:5px;height:5px;border-radius:50%;background:var(--border);transition:background .2s,transform .2s;cursor:pointer;border:none;padding:0;}
+  .carousel-dot.active{background:var(--accent);transform:scale(1.35);}
+  [data-theme="light"] .carousel-card{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.09);}
+
   /* PRINT STYLES — ink-efficient, white background */
   @media print {
     /* Hide everything except results */
@@ -589,6 +606,19 @@
       <div class="hero-pill"><span class="hero-pill-dot"></span>Exec summary &amp; themes</div>
       <div class="hero-pill"><span class="hero-pill-dot"></span>Save &amp; reload sessions</div>
       <div class="hero-pill"><span class="hero-pill-dot"></span>PDF, email &amp; TXT export</div>
+    </div>
+  </div>
+
+  <!-- CASE STUDIES CAROUSEL -->
+  <div class="use-cases" id="use-cases">
+    <div class="use-cases-label">How teams use Prism</div>
+    <div class="carousel-wrap">
+      <div class="carousel-card" id="carousel-card"></div>
+      <div class="carousel-controls">
+        <button class="carousel-btn" onclick="carouselPrev()" aria-label="Previous">←</button>
+        <div class="carousel-dots" id="carousel-dots"></div>
+        <button class="carousel-btn" onclick="carouselNext()" aria-label="Next">→</button>
+      </div>
     </div>
   </div>
 
@@ -1276,7 +1306,7 @@ Three questions — think before answering:
 2. CORE: ${state.brief.question} — think out loud, honest reaction.
 3. FOLLOW-UP: What single change would shift your answer positively?
 
-Respond with exactly: {"warmup":"2-3 sentences","core":"3-5 sentences thinking out loud","followup":"1-2 sentences","purchase_intent":<integer 1-10>,"wtp_low":<number>,"wtp_high":<number>,"top_objection":"one sentence"}`;
+Respond with exactly: {"warmup":"2-3 sentences","core":"3-5 sentences thinking out loud","followup":"1-2 sentences","purchase_intent":<integer 1-10>,"wtp_low":<dollar amount in USD, e.g. 4.99 not 499>,"wtp_high":<dollar amount in USD>,"top_objection":"one sentence"}`;
 
     try{
       const data=await callClaude([{role:'user',content:usr}],0.75,950,sys);
@@ -1332,7 +1362,7 @@ ${summary}
 Find the real story — tensions, surprises, clear signals.
 
 Output JSON with exactly these keys:
-{"executive_summary":"3-4 paragraph CMO narrative: dominant finding, key tension, surprising outlier, strategic implication","themes":[{"name":"Memorable 3-5 word name","description":"one sentence","persona_count":1,"representative_quote":"direct quote","persona_names":["name"]}],"segment_insights":"2 paragraphs on how responses differed by segment","recommended_actions":["action 1","action 2","action 3"],"avg_purchase_intent":7.5,"wtp_range":{"low":200,"high":400},"key_objections":["obj1","obj2","obj3"],"limitations":"2 sentences on synthetic research limitations."}
+{"executive_summary":"3-4 paragraph CMO narrative: dominant finding, key tension, surprising outlier, strategic implication","themes":[{"name":"Memorable 3-5 word name","description":"one sentence","persona_count":1,"representative_quote":"direct quote","persona_names":["name"]}],"segment_insights":"2 paragraphs on how responses differed by segment","recommended_actions":["action 1","action 2","action 3"],"avg_purchase_intent":7.5,"wtp_range":{"low":25,"high":75},"key_objections":["obj1","obj2","obj3"],"limitations":"2 sentences on synthetic research limitations."}
 
 Generate 4-6 themes with specific memorable names.`;
 
@@ -1722,9 +1752,59 @@ function resumeSession(){
   }catch(e){console.error('Resume error',e);}
 }
 
+// ── CAROUSEL ──
+const CASES=[
+  {tag:'SaaS · Pricing',title:'Price Sensitivity — Project Management Tool',insight:'"$79/mo landed cleanly across 6 of 8 personas. $129 triggered walk-away language from the Budget Stretcher and Practical Optimizer archetypes."',metric:'↑ 89% purchase intent at $79 vs. 41% at $129'},
+  {tag:'CPG · Concept Test',title:'New Product Launch — Functional Beverage',insight:'"Strong interest from Early Adopters and Lifestyle Aligners. Skeptics flagged ingredient transparency as the #1 trust barrier before purchase."',metric:'↑ 7.4 / 10 avg. purchase intent across 8 personas'},
+  {tag:'DTC · Messaging',title:'Value Proposition Test — Sustainable Apparel',insight:'"\'Built to last\' outperformed \'good for the planet\' on clarity (4.2 vs. 3.1) and motivation to act (4.4 vs. 2.8). Sustainability worked better as a secondary hook."',metric:'↑ Clarity score +35% with revised headline'},
+  {tag:'B2B SaaS · Research',title:'Procurement Friction — Enterprise Software',insight:'"7 of 8 personas cited approval-workflow complexity as their top blocker. Security review time was the #2 objection — informed a 3-month onboarding sprint."',metric:'↑ 3 clear action items surfaced in under 60 seconds'}
+];
+let carouselIdx=0,carouselTimer=null;
+function renderCarousel(idx,animate){
+  const card=document.getElementById('carousel-card');
+  const dotsEl=document.getElementById('carousel-dots');
+  if(!card||!dotsEl)return;
+  const c=CASES[idx];
+  const draw=()=>{
+    card.innerHTML=`<div class="carousel-tag">${c.tag}</div><div class="carousel-title">${c.title}</div><div class="carousel-insight">${c.insight}</div><div class="carousel-metric">${c.metric}</div>`;
+    card.classList.remove('fade-out');
+    dotsEl.innerHTML=CASES.map((_,i)=>`<button class="carousel-dot${i===idx?' active':''}" onclick="carouselGo(${i})" aria-label="Case ${i+1}"></button>`).join('');
+  };
+  if(animate){card.classList.add('fade-out');setTimeout(draw,330);}else{draw();}
+}
+function carouselNext(){carouselIdx=(carouselIdx+1)%CASES.length;renderCarousel(carouselIdx,true);resetCarouselTimer();}
+function carouselPrev(){carouselIdx=(carouselIdx+CASES.length-1)%CASES.length;renderCarousel(carouselIdx,true);resetCarouselTimer();}
+function carouselGo(idx){carouselIdx=idx;renderCarousel(idx,true);resetCarouselTimer();}
+function resetCarouselTimer(){clearInterval(carouselTimer);carouselTimer=setInterval(carouselNext,5500);}
+
+// ── PARALLAX ──
+(function(){
+  if(window.matchMedia('(prefers-reduced-motion:reduce)').matches||window.innerWidth<600)return;
+  const targets=[
+    {el:document.querySelector('.hero-prism'),rate:0.20},
+    {el:document.querySelector('.hero-heading'),rate:0.10},
+    {el:document.querySelector('.hero-subtitle'),rate:0.06},
+    {el:document.querySelector('.hero-btn'),rate:0.04}
+  ];
+  let ticking=false,ready=false;
+  const pills=document.querySelector('.hero-pills');
+  if(pills)pills.addEventListener('animationend',()=>{ready=true;},{once:true});
+  else ready=true;
+  window.addEventListener('scroll',()=>{
+    if(!ready||ticking)return;
+    requestAnimationFrame(()=>{
+      const sy=window.scrollY;
+      targets.forEach(({el,rate})=>{if(el)el.style.transform=sy>0?`translateY(${sy*-rate}px)`:'';});
+      ticking=false;
+    });
+    ticking=true;
+  });
+})();
+
 // ── INIT ──
 try{renderSessions();}catch(e){console.error('Session render error',e);}
 try{checkInProgressSession();}catch(e){console.error('Progress check error',e);}
+try{renderCarousel(0,false);resetCarouselTimer();}catch(e){console.error('Carousel init error',e);}
 </script>
 </body>
 </html>
