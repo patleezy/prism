@@ -53,7 +53,7 @@
     --card-bg:#faf9f5;--card-hover:#f0efe9;
   }
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
 
   /* HEADER */
   header{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:200;}
@@ -1754,10 +1754,10 @@ function resumeSession(){
 
 // ── CAROUSEL ──
 const CASES=[
-  {tag:'SaaS · Pricing',title:'Price Sensitivity — Project Management Tool',insight:'"$79/mo landed cleanly across 6 of 8 personas. $129 triggered walk-away language from the Budget Stretcher and Practical Optimizer archetypes."',metric:'↑ 89% purchase intent at $79 vs. 41% at $129'},
-  {tag:'CPG · Concept Test',title:'New Product Launch — Functional Beverage',insight:'"Strong interest from Early Adopters and Lifestyle Aligners. Skeptics flagged ingredient transparency as the #1 trust barrier before purchase."',metric:'↑ 7.4 / 10 avg. purchase intent across 8 personas'},
-  {tag:'DTC · Messaging',title:'Value Proposition Test — Sustainable Apparel',insight:'"\'Built to last\' outperformed \'good for the planet\' on clarity (4.2 vs. 3.1) and motivation to act (4.4 vs. 2.8). Sustainability worked better as a secondary hook."',metric:'↑ Clarity score +35% with revised headline'},
-  {tag:'B2B SaaS · Research',title:'Procurement Friction — Enterprise Software',insight:'"7 of 8 personas cited approval-workflow complexity as their top blocker. Security review time was the #2 objection — informed a 3-month onboarding sprint."',metric:'↑ 3 clear action items surfaced in under 60 seconds'}
+  {tag:'SaaS · Pricing',title:'We thought $49 was the sweet spot. It wasn\'t.',insight:'"Prism showed us $79 was the real number — and personas who worried cheap = low quality actually felt better about it."',metric:'↑ 6 of 8 personas willing to pay $79 · fewer price objections'},
+  {tag:'CPG · Concept Test',title:'Customers loved the idea — but wanted proof first.',insight:'"Prism surfaced something our internal reviews missed: people wanted to see the ingredient list before they\'d even consider trying it."',metric:'↑ 7.4 / 10 purchase intent · #1 ask: show the label'},
+  {tag:'DTC · Messaging',title:'We were leading with the wrong value prop.',insight:'"We led with sustainability. Prism told us durability was the real motivator — \'built to last\' outperformed \'good for the planet\' on every metric."',metric:'↑ Clarity +35% · motivation to act jumped from 2.8 to 4.4'},
+  {tag:'B2B · Sales',title:'We finally heard what buyers say in internal meetings.',insight:'"Prism gave us the exact language decision-makers use when evaluating security — which completely rewrote our objection-handling page."',metric:'↑ Top 3 objections identified in under 60 seconds'}
 ];
 let carouselIdx=0,carouselTimer=null;
 function renderCarousel(idx,animate){
@@ -1775,7 +1775,7 @@ function renderCarousel(idx,animate){
 function carouselNext(){carouselIdx=(carouselIdx+1)%CASES.length;renderCarousel(carouselIdx,true);resetCarouselTimer();}
 function carouselPrev(){carouselIdx=(carouselIdx+CASES.length-1)%CASES.length;renderCarousel(carouselIdx,true);resetCarouselTimer();}
 function carouselGo(idx){carouselIdx=idx;renderCarousel(idx,true);resetCarouselTimer();}
-function resetCarouselTimer(){clearInterval(carouselTimer);carouselTimer=setInterval(carouselNext,5500);}
+function resetCarouselTimer(){clearInterval(carouselTimer);carouselTimer=setInterval(carouselNext,7000);}
 
 // ── PARALLAX ──
 (function(){
