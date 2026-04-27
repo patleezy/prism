@@ -59,7 +59,7 @@ export default async function handler(req, res) {
   }
 
   // Force safe model — prevent using expensive models via prompt injection
-  body.model = 'claude-sonnet-4-20250514';
+  body.model = 'claude-sonnet-4-6';
 
   // Cap max_tokens
   if (!body.max_tokens || body.max_tokens > 4000) {
